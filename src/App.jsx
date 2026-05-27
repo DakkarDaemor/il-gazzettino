@@ -42,27 +42,30 @@ const mkProfile = (name = "Nuovo gazzettino") => ({
   id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
   name,
   feeds: [],
+  interests: [],
+  avoids: [],
 });
 
-function ArticleCard({ article }) {
+function ArticleCard({ article, highlighted }) {
   const [imgFailed, setImgFailed] = useState(false);
   const hasImg = article.image && !imgFailed;
   const domain = (() => { try { return new URL(article.url).hostname.replace("www.", ""); } catch { return ""; } })();
   return (
     <a href={article.url} target="_blank" rel="noopener noreferrer"
-      style={{ display: "flex", flexDirection: "column", background: C.card, border: `1px solid ${C.border}`, borderRadius: 6, overflow: "hidden", textDecoration: "none", transition: "border-color 0.2s, transform 0.2s, background 0.2s" }}
+      style={{ display: "flex", flexDirection: "column", background: C.card, border: `1px solid ${highlighted ? C.gold : C.border}`, borderRadius: 6, overflow: "hidden", textDecoration: "none", transition: "border-color 0.2s, transform 0.2s, background 0.2s" }}
       onMouseEnter={e => { e.currentTarget.style.borderColor = C.gold; e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.background = C.cardHover; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = C.card; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = highlighted ? C.gold : C.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = C.card; }}
     >
       {hasImg && (
         <div style={{ width: "100%", aspectRatio: "16/9", overflow: "hidden", flexShrink: 0 }}>
           <img src={article.image} alt="" onError={() => setImgFailed(true)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
       )}
-      {!hasImg && <div style={{ height: 2, background: `linear-gradient(90deg, ${C.gold}, transparent)` }} />}
+      {!hasImg && <div style={{ height: 2, background: `linear-gradient(90deg, ${highlighted ? C.gold : C.muted}, transparent)` }} />}
       <div style={{ padding: "13px 15px 15px", display: "flex", flexDirection: "column", gap: 7, flex: 1 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: 11, color: C.gold, fontFamily: "Crimson Pro, serif", textTransform: "uppercase", letterSpacing: 1, fontWeight: 600 }}>
+            {highlighted && <span style={{ marginRight: 4 }}>★</span>}
             {article.source?.name || domain || "Fonte"}
           </span>
           <span style={{ fontSize: 11, color: C.dim }}>{timeAgo(article.publishedAt)}</span>
@@ -82,13 +85,67 @@ function ArticleCard({ article }) {
   );
 }
 
+function KeywordChips({ keywords, color, onRemove }) {
+  if (!keywords.length) return null;
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+      {keywords.map(kw => (
+        <span key={kw} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: C.bg, border: `1px solid ${color}33`, borderRadius: 20, padding: "2px 8px 2px 10px", fontSize: 12, color }}>
+          {kw}
+          {onRemove && (
+            <button onClick={() => onRemove(kw)}
+              style={{ background: "none", border: "none", color, cursor: "pointer", fontSize: 13, padding: 0, lineHeight: 1, opacity: 0.7 }}>✕</button>
+          )}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function KeywordSection({ label, color, keywords, onAdd, onRemove, placeholder }) {
+  const [input, setInput] = useState("");
+  const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 4, padding: "7px 10px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 13, outline: "none", boxSizing: "border-box" };
+  const lbl = { display: "block", fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 5, fontFamily: "Crimson Pro, serif" };
+
+  const add = () => {
+    const kw = input.trim().toLowerCase();
+    if (!kw || keywords.includes(kw)) return;
+    onAdd(kw);
+    setInput("");
+  };
+
+  return (
+    <div>
+      <label style={{ ...lbl, color }}>{label}</label>
+      <div style={{ display: "flex", gap: 6 }}>
+        <input style={{ ...inp, flex: 1, width: "auto" }}
+          placeholder={placeholder}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && add()}
+        />
+        <button onClick={add}
+          style={{ background: "transparent", border: `1px solid ${color}55`, borderRadius: 4, padding: "7px 11px", color, fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0 }}>+</button>
+      </div>
+      <KeywordChips keywords={keywords} color={color} onRemove={onRemove} />
+    </div>
+  );
+}
+
 function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
-  const [form, setForm] = useState({ ...profile, feeds: [...(profile.feeds || [])] });
+  const [form, setForm] = useState({
+    ...profile,
+    feeds: [...(profile.feeds || [])],
+    interests: [...(profile.interests || [])],
+    avoids: [...(profile.avoids || [])],
+  });
   const [newFeedUrl, setNewFeedUrl] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const isNew = !!profile._isNew;
 
   const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 4, padding: "8px 10px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 14, outline: "none", boxSizing: "border-box" };
   const lbl = { display: "block", fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 5, fontFamily: "Crimson Pro, serif" };
+  const divider = <div style={{ height: 1, background: C.border }} />;
 
   const addFeed = (url) => {
     const u = (url ?? newFeedUrl).trim();
@@ -99,6 +156,9 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
 
   const removeFeed = (url) => setForm(f => ({ ...f, feeds: f.feeds.filter(u => u !== url) }));
 
+  const addKw = (list, kw) => { if (kw && !form[list].includes(kw)) setForm(f => ({ ...f, [list]: [...f[list], kw] })); };
+  const removeKw = (list, kw) => setForm(f => ({ ...f, [list]: f[list].filter(k => k !== kw) }));
+
   const available = SUGGESTED_FEEDS.filter(s => !form.feeds.includes(s.url));
 
   return (
@@ -107,6 +167,8 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
         <label style={lbl}>Nome gazzettino</label>
         <input style={inp} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </div>
+
+      {divider}
 
       <div>
         <label style={lbl}>Feed RSS</label>
@@ -126,7 +188,8 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
             {form.feeds.map(url => (
               <div key={url} style={{ display: "flex", alignItems: "center", gap: 6, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 4, padding: "6px 10px" }}>
                 <span style={{ flex: 1, fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</span>
-                <button onClick={() => removeFeed(url)} style={{ background: "none", border: "none", color: C.dim, cursor: "pointer", fontSize: 14, padding: "0 2px", flexShrink: 0 }}>✕</button>
+                <button onClick={() => removeFeed(url)}
+                  style={{ background: "transparent", border: `1px solid #5a2020`, borderRadius: 3, color: C.danger, cursor: "pointer", fontSize: 11, padding: "2px 7px", flexShrink: 0, fontFamily: "Crimson Pro, serif" }}>Rimuovi</button>
               </div>
             ))}
           </div>
@@ -147,6 +210,28 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
         )}
       </div>
 
+      {divider}
+
+      <KeywordSection
+        label="★ Argomenti di interesse"
+        color={C.gold}
+        keywords={form.interests}
+        onAdd={kw => addKw("interests", kw)}
+        onRemove={kw => removeKw("interests", kw)}
+        placeholder="es. tecnologia, politica…"
+      />
+
+      <KeywordSection
+        label="✕ Argomenti da evitare"
+        color={C.danger}
+        keywords={form.avoids}
+        onAdd={kw => addKw("avoids", kw)}
+        onRemove={kw => removeKw("avoids", kw)}
+        placeholder="es. gossip, sport…"
+      />
+
+      {divider}
+
       <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
         <button onClick={() => onSave(form)} disabled={!form.name.trim()}
           style={{ flex: 1, background: form.name.trim() ? C.gold : C.dim, border: "none", borderRadius: 4, padding: "9px", color: C.bg, fontFamily: "Playfair Display, serif", fontSize: 13, fontWeight: 700, cursor: form.name.trim() ? "pointer" : "not-allowed" }}>
@@ -156,11 +241,19 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
           style={{ flex: 1, background: "transparent", border: `1px solid ${C.border}`, borderRadius: 4, padding: "9px", color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 13, cursor: "pointer" }}>
           Annulla
         </button>
-        {!isNew && (
-          <button onClick={() => { if (window.confirm(`Eliminare "${profile.name}"?`)) onDelete(profile.id); }}
-            style={{ background: "transparent", border: "1px solid #5a2020", borderRadius: 4, padding: "9px 12px", color: C.danger, cursor: "pointer", fontSize: 15 }}>✕</button>
+        {!isNew && !confirmDelete && (
+          <button onClick={() => setConfirmDelete(true)}
+            style={{ background: "transparent", border: "1px solid #5a2020", borderRadius: 4, padding: "9px 12px", color: C.danger, cursor: "pointer", fontSize: 13, fontFamily: "Crimson Pro, serif" }}>Elimina</button>
+        )}
+        {!isNew && confirmDelete && (
+          <button onClick={() => onDelete(profile.id)}
+            style={{ background: "#3a1010", border: `1px solid ${C.danger}`, borderRadius: 4, padding: "9px 10px", color: C.danger, cursor: "pointer", fontSize: 12, fontFamily: "Playfair Display, serif", fontWeight: 700 }}>Sicuro?</button>
         )}
       </div>
+      {confirmDelete && (
+        <button onClick={() => setConfirmDelete(false)}
+          style={{ background: "none", border: "none", color: C.dim, cursor: "pointer", fontSize: 12, fontFamily: "Crimson Pro, serif", textAlign: "left", padding: 0 }}>← annulla eliminazione</button>
+      )}
     </div>
   );
 }
@@ -191,11 +284,12 @@ export default function App() {
         const p = await storage.get("gz_profiles");
         if (p) {
           const parsed = JSON.parse(p.value);
-          // migrate old GNews profiles: drop legacy fields, keep name + id
           const migrated = parsed.map(pr => ({
             id: pr.id,
             name: pr.name,
             feeds: pr.feeds || [],
+            interests: pr.interests || [],
+            avoids: pr.avoids || [],
           }));
           setProfiles(migrated);
           if (migrated.length > 0) setActiveId(migrated[0].id);
@@ -266,16 +360,30 @@ export default function App() {
     await handleSaveProfiles(next);
     if (!exists) setActiveId(clean.id);
     setEditingProfile(null);
+    setNews([]); setFetchedAt(null);
   }, [profiles, handleSaveProfiles]);
 
   const handleDeleteProfile = useCallback(async (id) => {
     const next = profiles.filter(p => p.id !== id);
     await handleSaveProfiles(next);
     if (activeId === id) setActiveId(next[0]?.id || null);
-    setEditingProfile(null); setNews([]);
+    setEditingProfile(null); setNews([]); setFetchedAt(null);
   }, [profiles, activeId, handleSaveProfiles]);
 
   const togglePanel = (p) => { setPanel(prev => prev === p ? null : p); setEditingProfile(null); };
+
+  const matchesAny = (article, keywords) => {
+    if (!keywords.length) return false;
+    const text = `${article.title} ${article.description}`.toLowerCase();
+    return keywords.some(kw => text.includes(kw));
+  };
+
+  const avoids = activeProfile?.avoids || [];
+  const interests = activeProfile?.interests || [];
+  const displayedNews = news
+    .filter(a => !matchesAny(a, avoids))
+    .map(a => ({ ...a, _highlighted: matchesAny(a, interests) }));
+  const filteredCount = news.length - displayedNews.length;
 
   if (!initialized) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: C.bg, color: C.gold, fontSize: 24 }}>·</div>
@@ -330,13 +438,17 @@ export default function App() {
               <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                 {profiles.map(p => (
                   <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 12px", background: C.bg, borderRadius: 4, border: `1px solid ${p.id === activeId ? C.gold : C.border}` }}>
-                    <div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontFamily: "Crimson Pro, serif", fontSize: 14, color: C.text }}>{p.name}</div>
                       <div style={{ fontSize: 11, color: C.dim, marginTop: 1 }}>
                         {p.feeds?.length ? `${p.feeds.length} feed` : "Nessun feed"}
+                        {p.interests?.length > 0 && <span style={{ color: C.gold }}> · ★{p.interests.length}</span>}
+                        {p.avoids?.length > 0 && <span style={{ color: C.danger }}> · ✕{p.avoids.length}</span>}
                       </div>
                     </div>
-                    <button onClick={() => setEditingProfile(p)} style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 11, padding: "2px 6px" }}>Modifica</button>
+                    <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+                      <button onClick={() => setEditingProfile(p)} style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 3, color: C.muted, cursor: "pointer", fontSize: 11, padding: "2px 8px", fontFamily: "Crimson Pro, serif" }}>Modifica</button>
+                    </div>
                   </div>
                 ))}
                 <button onClick={() => setEditingProfile({ ...mkProfile(), _isNew: true })}
@@ -377,11 +489,13 @@ export default function App() {
               <style>{`@keyframes gzp{0%,100%{transform:scale(.8);opacity:.3}50%{transform:scale(1.3);opacity:1}}`}</style>
             </div>
           )}
-          {fetchedAt && !loading && news.length > 0 && (
+          {fetchedAt && !loading && displayedNews.length > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 12, color: C.dim }}>
               <span style={{ color: C.gold, fontSize: 9 }}>●</span>
               <span>Aggiornato alle {fetchedAt}</span><span>·</span>
-              <span>{news.length} articoli</span>
+              <span>{displayedNews.length} articoli</span>
+              {filteredCount > 0 && <span style={{ color: C.danger }}>· {filteredCount} filtrati</span>}
+              {interests.length > 0 && <span style={{ color: C.gold }}>· ★ {displayedNews.filter(a => a._highlighted).length} in evidenza</span>}
             </div>
           )}
           {!loading && news.length === 0 && !error && activeProfile?.feeds?.length > 0 && (
@@ -391,9 +505,9 @@ export default function App() {
               <p style={{ fontSize: 14 }}>Premi <span style={{ color: C.gold }}>↻ Aggiorna</span> per caricare le notizie.</p>
             </div>
           )}
-          {news.length > 0 && !loading && (
+          {displayedNews.length > 0 && !loading && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(265px, 1fr))", gap: 14 }}>
-              {news.map((article, i) => <ArticleCard key={i} article={article} />)}
+              {displayedNews.map((article, i) => <ArticleCard key={i} article={article} highlighted={article._highlighted} />)}
             </div>
           )}
         </main>
