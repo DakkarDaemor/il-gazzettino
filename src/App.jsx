@@ -9,7 +9,7 @@ const storage = {
   },
 };
 
-const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+const CORS_PROXY = "/api/rss?url=";
 
 function parseFeed(xmlText, feedUrl) {
   const doc = new DOMParser().parseFromString(xmlText, "text/xml");
@@ -49,81 +49,72 @@ function parseFeed(xmlText, feedUrl) {
   });
 }
 
-/* ── Palette: nero + verde, massimo 6 valori ── */
+/* ── Palette: nero + verde, max 6 valori ──
+   Contrasti su #000:  text 15.4:1 · muted 5.9:1 · green 9.2:1 · danger 5.6:1  */
 const C = {
-  bg:        "#000000",
-  card:      "#0d0d0d",
-  hover:     "#161616",
-  green:     "#22c55e",
-  greenDim:  "#071a0e",
-  text:      "#ebebeb",
-  muted:     "#888888",
-  border:    "#1e1e1e",
-  danger:    "#ef4444",
+  bg:       "#000000",
+  card:     "#0d0d0d",
+  hover:    "#161616",
+  green:    "#22c55e",
+  greenDim: "#071a0e",
+  text:     "#ebebeb",   /* 15.4:1 su #000 */
+  muted:    "#888888",   /*  5.9:1 su #000  — minimo usato per testo */
+  border:   "#1e1e1e",
+  danger:   "#ef4444",   /*  5.6:1 su #000 */
 };
 
-/* CSS globale iniettato una volta sola */
+/* ── CSS globale iniettato una volta — font scale +2px rispetto all'originale ── */
 const GLOBAL_CSS = `
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:#000;overflow-x:hidden}
 
-/* ── Griglia articoli ── */
 .gz-grid{display:grid;gap:10px;grid-template-columns:1fr}
 @media(min-width:480px){.gz-grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:900px){.gz-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}}
+@media(min-width:900px){.gz-grid{grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}}
 
-/* ── Card: mobile=orizz, desktop=vert ── */
+/* Card: orizz su mobile, vert su desktop */
 .gz-card{display:flex;flex-direction:row;background:#0d0d0d;border-radius:8px;overflow:hidden;text-decoration:none;transition:border-color .15s,transform .15s}
 @media(min-width:900px){.gz-card{flex-direction:column}}
 @media(hover:hover){.gz-card:hover{border-color:#22c55e!important;transform:translateY(-2px)}}
 
-.gz-card-img{width:90px;height:90px;object-fit:cover;flex-shrink:0}
+.gz-card-img{width:92px;height:92px;object-fit:cover;flex-shrink:0}
 @media(min-width:900px){.gz-card-img{width:100%;height:auto;aspect-ratio:16/9}}
 
 .gz-card-stripe{width:3px;flex-shrink:0;align-self:stretch}
 @media(min-width:900px){.gz-card-stripe{width:100%;height:2px;align-self:auto}}
 
-.gz-card-body{padding:10px 12px;display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
-@media(min-width:900px){.gz-card-body{padding:13px 15px 15px;gap:8px}}
+.gz-card-body{padding:11px 13px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+@media(min-width:900px){.gz-card-body{padding:14px 16px 16px;gap:9px}}
 
-.gz-card-title{margin:0;font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#ebebeb;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-@media(min-width:900px){.gz-card-title{font-size:16px;-webkit-line-clamp:3}}
+/* Titolo: 16px mobile (+2), 18px desktop (+2) */
+.gz-card-title{margin:0;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#ebebeb;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(min-width:900px){.gz-card-title{font-size:18px;-webkit-line-clamp:3}}
 
-.gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:12px;color:#888;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-@media(min-width:900px){.gz-card-desc{font-size:14px;line-height:1.65;-webkit-line-clamp:3}}
+/* Descrizione: 14px mobile (+2), 16px desktop (+2) */
+.gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:14px;color:#888888;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(min-width:900px){.gz-card-desc{font-size:16px;line-height:1.65;-webkit-line-clamp:3}}
 
-/* ── Sidebar: overlay mobile, pannello fisso desktop ── */
+/* Sidebar */
 .gz-aside{position:fixed;inset:0;z-index:200;overflow-y:auto;background:#000;border-right:none}
-@media(min-width:640px){.gz-aside{position:sticky;inset:auto;top:0;width:300px;flex-shrink:0;max-height:100vh;z-index:10;background:#0d0d0d;border-right:1px solid #1e1e1e}}
+@media(min-width:640px){.gz-aside{position:sticky;inset:auto;top:0;width:310px;flex-shrink:0;max-height:100vh;z-index:10;background:#0d0d0d;border-right:1px solid #1e1e1e}}
 
-/* ── Header date: nascosta su mobile ── */
 .gz-date{display:none}
 @media(min-width:480px){.gz-date{display:inline}}
 
-/* ── Tab profilo ── */
-.gz-tab{min-height:36px;min-width:44px;transition:all .15s;white-space:nowrap;flex-shrink:0}
-
-/* ── Bottone aggiorna ── */
-.gz-refresh{min-height:36px;min-width:44px}
-
-/* ── Input focus ── */
 input:focus,textarea:focus{outline:none;border-color:#22c55e!important}
-
-/* ── Scrollbar ── */
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:#000}
-::-webkit-scrollbar-thumb{background:#222;border-radius:2px}
-
-/* ── Animazione loading ── */
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
 @keyframes gzp{0%,100%{transform:scale(.8);opacity:.3}50%{transform:scale(1.3);opacity:1}}
 `;
 
 const SUGGESTED_FEEDS = [
-  { label: "ANSA – Ultime notizie", url: "https://www.ansa.it/sito/notizie/cronaca/cronaca_rss.xml" },
+  { label: "ANSA – Cronaca", url: "https://www.ansa.it/sito/notizie/cronaca/cronaca_rss.xml" },
+  { label: "ANSA – Politica", url: "https://www.ansa.it/sito/notizie/politica/politica_rss.xml" },
   { label: "Repubblica", url: "https://www.repubblica.it/rss/homepage/rss2.0.xml" },
-  { label: "BolognaToday", url: "https://www.bolognatoday.it/rss.xml" },
+  { label: "Corriere della Sera", url: "https://xml2.corriereobjects.it/rss/homepage.xml" },
+  { label: "Il Sole 24 Ore", url: "https://www.ilsole24ore.com/rss/italia--e-mondo.xml" },
   { label: "il Resto del Carlino – Bologna", url: "https://www.ilrestodelcarlino.it/bologna/rss" },
-  { label: "Corriere di Bologna", url: "https://corrieredibologna.corriere.it/rss.xml" },
 ];
 
 function timeAgo(dateStr) {
@@ -149,35 +140,35 @@ function ArticleCard({ article, highlighted }) {
   const [imgFailed, setImgFailed] = useState(false);
   const hasImg = article.image && !imgFailed;
   const domain = (() => { try { return new URL(article.url).hostname.replace("www.", ""); } catch { return ""; } })();
-  const borderColor = highlighted ? C.green : C.border;
 
   return (
     <a href={article.url} target="_blank" rel="noopener noreferrer"
       className="gz-card"
-      style={{ border: `1px solid ${borderColor}` }}>
+      style={{ border: `1px solid ${highlighted ? C.green : C.border}` }}>
 
       {hasImg
         ? <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
-        : <div className="gz-card-stripe" style={{ background: highlighted ? C.green : "#222" }} />
+        : <div className="gz-card-stripe" style={{ background: highlighted ? C.green : "#2a2a2a" }} />
       }
 
       <div className="gz-card-body">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6 }}>
-          <span style={{ fontSize: 10, color: C.green, fontFamily: "Crimson Pro, serif", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600, lineHeight: 1.3 }}>
+          {/* 12px (+2) — verde 9.2:1 su #000 */}
+          <span style={{ fontSize: 12, color: C.green, fontFamily: "Crimson Pro, serif", textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600, lineHeight: 1.3 }}>
             {highlighted && "★ "}{article.source?.name || domain || "Fonte"}
           </span>
-          <span style={{ fontSize: 10, color: C.muted, flexShrink: 0 }}>{timeAgo(article.publishedAt)}</span>
+          {/* 12px (+2) — muted 5.9:1 su #000 */}
+          <span style={{ fontSize: 12, color: C.muted, flexShrink: 0 }}>{timeAgo(article.publishedAt)}</span>
         </div>
 
         <h3 className="gz-card-title">{article.title}</h3>
 
-        {article.description && (
-          <p className="gz-card-desc">{article.description}</p>
-        )}
+        {article.description && <p className="gz-card-desc">{article.description}</p>}
 
         <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", paddingTop: 4 }}>
-          <span style={{ fontSize: 10, color: "#333" }}>{domain}</span>
-          <span style={{ fontSize: 11, color: C.green }}>↗</span>
+          {/* 12px (+2) — muted 5.9:1 */}
+          <span style={{ fontSize: 12, color: C.muted }}>{domain}</span>
+          <span style={{ fontSize: 13, color: C.green }}>↗</span>
         </div>
       </div>
     </a>
@@ -187,13 +178,13 @@ function ArticleCard({ article, highlighted }) {
 function KeywordChips({ keywords, color, onRemove }) {
   if (!keywords.length) return null;
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 7 }}>
       {keywords.map(kw => (
-        <span key={kw} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: C.bg, border: `1px solid ${color}44`, borderRadius: 20, padding: "3px 8px 3px 10px", fontSize: 12, color }}>
+        <span key={kw} style={{ display: "inline-flex", alignItems: "center", gap: 5, background: C.bg, border: `1px solid ${color}44`, borderRadius: 20, padding: "4px 9px 4px 11px", fontSize: 14 /* +2 */, color }}>
           {kw}
           {onRemove && (
             <button onClick={() => onRemove(kw)}
-              style={{ background: "none", border: "none", color, cursor: "pointer", fontSize: 13, padding: "0 1px", lineHeight: 1, opacity: 0.7 }}>✕</button>
+              style={{ background: "none", border: "none", color, cursor: "pointer", fontSize: 15 /* +2 */, padding: "0 1px", lineHeight: 1, opacity: 0.7 }}>✕</button>
           )}
         </span>
       ))}
@@ -203,8 +194,10 @@ function KeywordChips({ keywords, color, onRemove }) {
 
 function KeywordSection({ label, color, keywords, onAdd, onRemove, placeholder }) {
   const [input, setInput] = useState("");
-  const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "8px 10px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 13, outline: "none", boxSizing: "border-box" };
-  const lbl = { display: "block", fontSize: 11, color, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
+  /* fontSize 15 (+2) */
+  const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 11px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 15, outline: "none", boxSizing: "border-box" };
+  /* fontSize 13 (+2) */
+  const lbl = { display: "block", fontSize: 13, color, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
 
   const add = () => {
     const kw = input.trim().toLowerCase();
@@ -223,8 +216,9 @@ function KeywordSection({ label, color, keywords, onAdd, onRemove, placeholder }
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && add()}
         />
+        {/* fontSize 16 (+2) */}
         <button onClick={add}
-          style={{ background: "transparent", border: `1px solid ${color}55`, borderRadius: 6, padding: "8px 13px", color, fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 14, cursor: "pointer", flexShrink: 0, minWidth: 44 }}>+</button>
+          style={{ background: "transparent", border: `1px solid ${color}55`, borderRadius: 6, padding: "9px 14px", color, fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: "pointer", flexShrink: 0, minWidth: 46 }}>+</button>
       </div>
       <KeywordChips keywords={keywords} color={color} onRemove={onRemove} />
     </div>
@@ -242,8 +236,10 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const isNew = !!profile._isNew;
 
-  const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 12px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 14, outline: "none", boxSizing: "border-box" };
-  const lbl = { display: "block", fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
+  /* fontSize 16 (+2) */
+  const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 13px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 16, outline: "none", boxSizing: "border-box" };
+  /* fontSize 13 (+2) — muted 5.9:1 */
+  const lbl = { display: "block", fontSize: 13, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
   const divider = <div style={{ height: 1, background: C.border }} />;
 
   const addFeed = (url) => {
@@ -259,9 +255,10 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
 
   const available = SUGGESTED_FEEDS.filter(s => !form.feeds.includes(s.url));
 
+  /* fontSize 15 (+2) */
   const btn = (style) => ({
-    border: "none", borderRadius: 6, padding: "11px 14px", fontFamily: "Playfair Display, serif",
-    fontSize: 13, fontWeight: 700, cursor: "pointer", minHeight: 44, ...style,
+    border: "none", borderRadius: 6, padding: "12px 15px", fontFamily: "Playfair Display, serif",
+    fontSize: 15, fontWeight: 700, cursor: "pointer", minHeight: 46, ...style,
   });
 
   return (
@@ -275,7 +272,7 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
 
       <div>
         <label style={lbl}>Feed RSS</label>
-        <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 9 }}>
           <input style={{ ...inp, flex: 1, width: "auto" }}
             placeholder="https://esempio.it/rss.xml"
             value={newFeedUrl}
@@ -283,16 +280,18 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
             onKeyDown={e => e.key === "Enter" && addFeed()}
           />
           <button onClick={() => addFeed(undefined)}
-            style={btn({ background: C.green, color: "#000", minWidth: 44 })}>+</button>
+            style={btn({ background: C.green, color: "#000", minWidth: 46 })}>+</button>
         </div>
 
         {form.feeds.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 11 }}>
             {form.feeds.map(url => (
-              <div key={url} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "8px 12px" }}>
-                <span style={{ flex: 1, fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</span>
+              <div key={url} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 13px" }}>
+                {/* fontSize 13 (+2) — muted 5.9:1 */}
+                <span style={{ flex: 1, fontSize: 13, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</span>
+                {/* fontSize 13 (+2) — danger 5.6:1 */}
                 <button onClick={() => removeFeed(url)}
-                  style={{ background: "transparent", border: `1px solid ${C.danger}44`, borderRadius: 4, color: C.danger, cursor: "pointer", fontSize: 11, padding: "3px 8px", flexShrink: 0, minHeight: 28 }}>Rimuovi</button>
+                  style={{ background: "transparent", border: `1px solid ${C.danger}55`, borderRadius: 4, color: C.danger, cursor: "pointer", fontSize: 13, padding: "4px 9px", flexShrink: 0, minHeight: 30 }}>Rimuovi</button>
               </div>
             ))}
           </div>
@@ -304,7 +303,7 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               {available.map(s => (
                 <button key={s.url} onClick={() => addFeed(s.url)}
-                  style={{ background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 6, padding: "9px 12px", color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 13, cursor: "pointer", textAlign: "left", minHeight: 40 }}>
+                  style={{ background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 6, padding: "10px 13px", color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 15, cursor: "pointer", textAlign: "left", minHeight: 42 }}>
                   + {s.label}
                 </button>
               ))}
@@ -346,16 +345,17 @@ function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
         </button>
         {!isNew && !confirmDelete && (
           <button onClick={() => setConfirmDelete(true)}
-            style={btn({ background: "transparent", border: `1px solid ${C.danger}44`, color: C.danger, cursor: "pointer", minWidth: 44 })}>✕</button>
+            style={btn({ background: "transparent", border: `1px solid ${C.danger}55`, color: C.danger, cursor: "pointer", minWidth: 46 })}>✕</button>
         )}
         {!isNew && confirmDelete && (
           <button onClick={() => onDelete(profile.id)}
             style={btn({ background: "#1a0606", border: `1px solid ${C.danger}`, color: C.danger, cursor: "pointer" })}>Sicuro?</button>
         )}
       </div>
+      {/* fontSize 14 (+2) — muted 5.9:1 */}
       {confirmDelete && (
         <button onClick={() => setConfirmDelete(false)}
-          style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 12, fontFamily: "Crimson Pro, serif", textAlign: "left", padding: 0 }}>← annulla eliminazione</button>
+          style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 14, fontFamily: "Crimson Pro, serif", textAlign: "left", padding: 0 }}>← annulla eliminazione</button>
       )}
     </div>
   );
@@ -372,12 +372,9 @@ export default function App() {
   const [fetchedAt, setFetchedAt] = useState(null);
   const [initialized, setInitialized] = useState(false);
 
-  /* Inietta CSS globale e font una sola volta */
   useEffect(() => {
     if (!document.getElementById("gz-global")) {
-      const s = document.createElement("style");
-      s.id = "gz-global";
-      s.textContent = GLOBAL_CSS;
+      const s = document.createElement("style"); s.id = "gz-global"; s.textContent = GLOBAL_CSS;
       document.head.appendChild(s);
     }
     if (!document.getElementById("gz-fonts")) {
@@ -485,10 +482,8 @@ export default function App() {
   const filteredCount = news.length - displayedNews.length;
 
   if (!initialized) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: C.bg, color: C.green, fontSize: 28 }}>·</div>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: C.bg, color: C.green, fontSize: 30 }}>·</div>
   );
-
-  const asidePadding = { padding: "0 18px 24px" };
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "Crimson Pro, serif" }}>
@@ -497,36 +492,40 @@ export default function App() {
       <header style={{ position: "sticky", top: 0, zIndex: 100, background: C.bg, borderBottom: `1px solid ${C.border}` }}>
 
         {/* Riga logo */}
-        <div style={{ padding: "10px 16px 8px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ padding: "10px 16px 9px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.border}` }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 20, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>IL GAZZETTINO</h1>
-            <span className="gz-date" style={{ fontSize: 10, color: "#333", letterSpacing: 1.1 }}>
+            {/* fontSize 22 (+2) */}
+            <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 22, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>IL GAZZETTINO</h1>
+            {/* fontSize 12 (+2) — muted 5.9:1 */}
+            <span className="gz-date" style={{ fontSize: 12, color: C.muted, letterSpacing: 1.1 }}>
               {new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" }).toUpperCase()}
             </span>
           </div>
+          {/* fontSize 18 invariato (già grande, è un'icona) */}
           <button onClick={() => togglePanel("profiles")} title="Profili"
-            style={{ background: panel === "profiles" ? C.greenDim : "none", border: `1px solid ${panel === "profiles" ? C.green + "44" : "transparent"}`, borderRadius: 6, color: panel === "profiles" ? C.green : C.muted, cursor: "pointer", fontSize: 16, padding: "6px 10px", minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
+            style={{ background: panel === "profiles" ? C.greenDim : "none", border: `1px solid ${panel === "profiles" ? C.green + "44" : "transparent"}`, borderRadius: 6, color: panel === "profiles" ? C.green : C.muted, cursor: "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
         </div>
 
-        {/* Riga profili + aggiorna */}
+        {/* Riga profili */}
         {profiles.length > 0 && (
-          <div style={{ padding: "6px 16px", display: "flex", alignItems: "center", gap: 6, overflowX: "auto" }}>
+          <div style={{ padding: "7px 16px", display: "flex", alignItems: "center", gap: 7, overflowX: "auto" }}>
             {profiles.map(p => (
-              <button key={p.id} className="gz-tab"
+              <button key={p.id}
                 onClick={() => { setActiveId(p.id); setNews([]); setError(""); setFetchedAt(null); }}
                 onDoubleClick={() => { setEditingProfile(p); setPanel("profiles"); }}
                 title="Doppio click per modificare"
-                style={{ background: p.id === activeId ? C.green : "transparent", color: p.id === activeId ? "#000" : C.muted, border: `1px solid ${p.id === activeId ? C.green : C.border}`, borderRadius: 6, padding: "5px 14px", fontFamily: "Crimson Pro, serif", fontSize: 13, cursor: "pointer", fontWeight: p.id === activeId ? 600 : 400 }}>
+                style={{ background: p.id === activeId ? C.green : "transparent", color: p.id === activeId ? "#000" : C.muted, border: `1px solid ${p.id === activeId ? C.green : C.border}`, borderRadius: 6, padding: "6px 15px", fontFamily: "Crimson Pro, serif", fontSize: 15, cursor: "pointer", whiteSpace: "nowrap", fontWeight: p.id === activeId ? 600 : 400, minHeight: 38, flexShrink: 0 }}>
                 {p.name}
               </button>
             ))}
-            <button className="gz-tab"
+            {/* fontSize 14 (+2) — muted 5.9:1 */}
+            <button
               onClick={() => { setEditingProfile({ ...mkProfile(), _isNew: true }); setPanel("profiles"); }}
-              style={{ background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 6, padding: "5px 12px", color: "#444", fontFamily: "Crimson Pro, serif", fontSize: 12, cursor: "pointer" }}>+ Nuovo</button>
+              style={{ background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 6, padding: "6px 13px", color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 14, cursor: "pointer", flexShrink: 0, minHeight: 38 }}>+ Nuovo</button>
+            {/* fontSize 15 (+2) */}
             {activeProfile && (
-              <button className="gz-refresh"
-                onClick={() => fetchNews(activeProfile)} disabled={loading}
-                style={{ marginLeft: "auto", background: loading ? C.border : C.green, color: loading ? C.muted : "#000", border: "none", borderRadius: 6, padding: "5px 18px", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 13, cursor: loading ? "not-allowed" : "pointer", flexShrink: 0 }}>
+              <button onClick={() => fetchNews(activeProfile)} disabled={loading}
+                style={{ marginLeft: "auto", background: loading ? C.border : C.green, color: loading ? C.muted : "#000", border: "none", borderRadius: 6, padding: "6px 20px", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 15, cursor: loading ? "not-allowed" : "pointer", flexShrink: 0, minHeight: 38 }}>
                 {loading ? "…" : "↻ Aggiorna"}
               </button>
             )}
@@ -540,36 +539,41 @@ export default function App() {
         {panel && (
           <aside className="gz-aside">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px 14px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "inherit", zIndex: 1 }}>
-              <h2 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 13, color: C.green, textTransform: "uppercase", letterSpacing: 1.2 }}>
+              {/* fontSize 15 (+2) */}
+              <h2 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 15, color: C.green, textTransform: "uppercase", letterSpacing: 1.2 }}>
                 {editingProfile ? (editingProfile._isNew ? "Nuovo profilo" : "Modifica") : "Profili"}
               </h2>
               <button onClick={() => { setPanel(null); setEditingProfile(null); }}
-                style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 16, padding: "4px 10px", minWidth: 36, minHeight: 36 }}>✕</button>
+                style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 17, padding: "4px 11px", minWidth: 38, minHeight: 38 }}>✕</button>
             </div>
 
-            <div style={asidePadding}>
+            <div style={{ padding: "0 18px 24px" }}>
               {editingProfile ? (
                 <div style={{ paddingTop: 16 }}>
                   <ProfileEditor profile={editingProfile} onSave={handleSaveProfile} onDelete={handleDeleteProfile} onCancel={() => setEditingProfile(null)} />
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingTop: 14 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 9, paddingTop: 14 }}>
                   {profiles.map(p => (
-                    <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${p.id === activeId ? C.green : C.border}` }}>
+                    <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${p.id === activeId ? C.green : C.border}` }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: "Crimson Pro, serif", fontSize: 14, color: C.text }}>{p.name}</div>
-                        <div style={{ fontSize: 11, color: "#444", marginTop: 2 }}>
+                        {/* fontSize 16 (+2) — text 15.4:1 */}
+                        <div style={{ fontFamily: "Crimson Pro, serif", fontSize: 16, color: C.text }}>{p.name}</div>
+                        {/* fontSize 13 (+2) — muted 5.9:1 */}
+                        <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>
                           {p.feeds?.length ? `${p.feeds.length} feed` : "Nessun feed"}
                           {p.interests?.length > 0 && <span style={{ color: C.green }}> · ★{p.interests.length}</span>}
                           {p.avoids?.length > 0 && <span style={{ color: C.danger }}> · ✕{p.avoids.length}</span>}
                         </div>
                       </div>
+                      {/* fontSize 14 (+2) — muted 5.9:1 */}
                       <button onClick={() => setEditingProfile(p)}
-                        style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 12, padding: "5px 10px", minHeight: 32, fontFamily: "Crimson Pro, serif" }}>Modifica</button>
+                        style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 14, padding: "5px 11px", minHeight: 34, fontFamily: "Crimson Pro, serif", flexShrink: 0 }}>Modifica</button>
                     </div>
                   ))}
+                  {/* fontSize 16 (+2) — muted 5.9:1 */}
                   <button onClick={() => setEditingProfile({ ...mkProfile(), _isNew: true })}
-                    style={{ marginTop: 4, padding: "12px", background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 8, color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 14, cursor: "pointer", minHeight: 46 }}>+ Aggiungi profilo</button>
+                    style={{ marginTop: 4, padding: "13px", background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 8, color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 16, cursor: "pointer", minHeight: 48 }}>+ Aggiungi profilo</button>
                 </div>
               )}
             </div>
@@ -579,47 +583,48 @@ export default function App() {
         {/* ── Contenuto principale ── */}
         <main style={{ flex: 1, padding: "16px", minWidth: 0 }}>
 
-          {/* Welcome state */}
           {profiles.length === 0 && (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
-              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 48, color: C.green, marginBottom: 16, opacity: 0.4 }}>✦</div>
-              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 20, color: C.text, marginBottom: 8 }}>Benvenuto nel Gazzettino</p>
-              <p style={{ fontSize: 15, color: C.muted, marginBottom: 24 }}>Crea un profilo e aggiungi i feed RSS delle tue fonti preferite.</p>
+              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 50, color: C.green, marginBottom: 16, opacity: 0.4 }}>✦</div>
+              {/* fontSize 22 (+2) */}
+              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 22, color: C.text, marginBottom: 8 }}>Benvenuto nel Gazzettino</p>
+              {/* fontSize 17 (+2) — muted 5.9:1 */}
+              <p style={{ fontSize: 17, color: C.muted, marginBottom: 24 }}>Crea un profilo e aggiungi i feed RSS delle tue fonti preferite.</p>
+              {/* fontSize 16 (+2) */}
               <button onClick={() => { setEditingProfile({ ...mkProfile(), _isNew: true }); setPanel("profiles"); }}
-                style={{ background: C.green, border: "none", borderRadius: 8, padding: "12px 28px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 14, cursor: "pointer", minHeight: 48 }}>+ Crea profilo</button>
+                style={{ background: C.green, border: "none", borderRadius: 8, padding: "13px 30px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: "pointer", minHeight: 50 }}>+ Crea profilo</button>
             </div>
           )}
 
-          {/* No feeds state */}
           {activeProfile && !activeProfile.feeds?.length && !loading && (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
-              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 48, color: C.green, marginBottom: 16, opacity: 0.3 }}>◈</div>
-              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 20, color: C.text, marginBottom: 8 }}>{activeProfile.name}</p>
-              <p style={{ fontSize: 15, color: C.muted, marginBottom: 24 }}>Nessun feed RSS configurato per questo profilo.</p>
+              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 50, color: C.green, marginBottom: 16, opacity: 0.3 }}>◈</div>
+              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 22, color: C.text, marginBottom: 8 }}>{activeProfile.name}</p>
+              <p style={{ fontSize: 17, color: C.muted, marginBottom: 24 }}>Nessun feed RSS configurato per questo profilo.</p>
               <button onClick={() => { setEditingProfile(activeProfile); setPanel("profiles"); }}
-                style={{ background: C.green, border: "none", borderRadius: 8, padding: "12px 28px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 14, cursor: "pointer", minHeight: 48 }}>Aggiungi feed</button>
+                style={{ background: C.green, border: "none", borderRadius: 8, padding: "13px 30px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: "pointer", minHeight: 50 }}>Aggiungi feed</button>
             </div>
           )}
 
-          {/* Errore */}
+          {/* fontSize 16 (+2) — #f87171 ~5.5:1 su #130808 */}
           {error && (
-            <div style={{ background: "#130808", border: `1px solid ${C.danger}44`, borderRadius: 8, padding: "12px 16px", color: "#f87171", fontSize: 14, marginBottom: 16 }}>{error}</div>
+            <div style={{ background: "#130808", border: `1px solid ${C.danger}44`, borderRadius: 8, padding: "13px 17px", color: "#f87171", fontSize: 16, marginBottom: 16 }}>{error}</div>
           )}
 
-          {/* Loading */}
           {loading && (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
-              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 12, color: C.muted, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 20 }}>Raccolta notizie…</div>
+              {/* fontSize 14 (+2) — muted 5.9:1 */}
+              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 14, color: C.muted, letterSpacing: 2.5, textTransform: "uppercase", marginBottom: 20 }}>Raccolta notizie…</div>
               <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-                {[0, 1, 2].map(i => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: C.green, animation: `gzp 1.2s ease-in-out ${i * 0.2}s infinite` }} />)}
+                {[0, 1, 2].map(i => <div key={i} style={{ width: 9, height: 9, borderRadius: "50%", background: C.green, animation: `gzp 1.2s ease-in-out ${i * 0.2}s infinite` }} />)}
               </div>
             </div>
           )}
 
-          {/* Barra stato */}
+          {/* Barra stato — fontSize 13 (+2) — muted 5.9:1 */}
           {fetchedAt && !loading && displayedNews.length > 0 && (
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: 14, fontSize: 11, color: "#444" }}>
-              <span style={{ color: C.green, fontSize: 8 }}>●</span>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6, marginBottom: 14, fontSize: 13, color: C.muted }}>
+              <span style={{ color: C.green, fontSize: 9 }}>●</span>
               <span>{fetchedAt}</span>
               <span>·</span>
               <span>{displayedNews.length} articoli</span>
@@ -628,16 +633,16 @@ export default function App() {
             </div>
           )}
 
-          {/* Prompt aggiorna */}
           {!loading && news.length === 0 && !error && activeProfile?.feeds?.length > 0 && (
             <div style={{ textAlign: "center", padding: "70px 20px" }}>
-              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 40, color: C.green, opacity: 0.15, marginBottom: 16 }}>◈</div>
-              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 16, color: C.text, marginBottom: 6 }}>{activeProfile.name}</p>
-              <p style={{ fontSize: 14, color: C.muted }}>Premi <span style={{ color: C.green }}>↻ Aggiorna</span> per caricare le notizie.</p>
+              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 42, color: C.green, opacity: 0.15, marginBottom: 16 }}>◈</div>
+              {/* fontSize 18 (+2) */}
+              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 18, color: C.text, marginBottom: 7 }}>{activeProfile.name}</p>
+              {/* fontSize 16 (+2) — muted 5.9:1 */}
+              <p style={{ fontSize: 16, color: C.muted }}>Premi <span style={{ color: C.green }}>↻ Aggiorna</span> per caricare le notizie.</p>
             </div>
           )}
 
-          {/* Griglia articoli */}
           {displayedNews.length > 0 && !loading && (
             <div className="gz-grid">
               {displayedNews.map((article, i) => (
