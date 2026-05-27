@@ -48,7 +48,7 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "Crimson Pro, serif" }}>
 
       <header style={{ position: "sticky", top: 0, zIndex: 100, background: C.bg, borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ padding: "10px 16px 9px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ padding: "10px 16px 9px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
             <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 22, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>IL GAZZETTINO</h1>
             <span className="gz-date" style={{ fontSize: 12, color: C.muted, letterSpacing: 1.1 }}>
@@ -58,29 +58,6 @@ export default function App() {
           <button onClick={() => togglePanel("profiles")} title="Profili"
             style={{ background: panel === "profiles" ? C.greenDim : "none", border: `1px solid ${panel === "profiles" ? C.green + "44" : "transparent"}`, borderRadius: 6, color: panel === "profiles" ? C.green : C.muted, cursor: "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
         </div>
-
-        {profiles.length > 0 && (
-          <div style={{ padding: "7px 16px", display: "flex", alignItems: "center", gap: 7, overflowX: "auto" }}>
-            {profiles.map(p => (
-              <button key={p.id}
-                onClick={() => { setActiveId(p.id); clearNews(); }}
-                onDoubleClick={() => { setEditingProfile(p); setPanel("profiles"); }}
-                title="Doppio click per modificare"
-                style={{ background: p.id === activeId ? C.green : "transparent", color: p.id === activeId ? "#000" : C.muted, border: `1px solid ${p.id === activeId ? C.green : C.border}`, borderRadius: 6, padding: "6px 15px", fontFamily: "Crimson Pro, serif", fontSize: 15, cursor: "pointer", whiteSpace: "nowrap", fontWeight: p.id === activeId ? 600 : 400, minHeight: 38, flexShrink: 0 }}>
-                {p.name}
-              </button>
-            ))}
-            <button
-              onClick={() => { setEditingProfile({ ...mkProfile(), _isNew: true }); setPanel("profiles"); }}
-              style={{ background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 6, padding: "6px 13px", color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 14, cursor: "pointer", flexShrink: 0, minHeight: 38 }}>+ Nuovo</button>
-            {activeProfile && (
-              <button onClick={() => fetchNews(activeProfile)} disabled={loading}
-                style={{ marginLeft: "auto", background: loading ? C.border : C.green, color: loading ? C.muted : "#000", border: "none", borderRadius: 6, padding: "6px 20px", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 15, cursor: loading ? "not-allowed" : "pointer", flexShrink: 0, minHeight: 38 }}>
-                {loading ? "…" : "↻ Aggiorna"}
-              </button>
-            )}
-          </div>
-        )}
       </header>
 
       <div style={{ display: "flex" }}>
@@ -88,12 +65,16 @@ export default function App() {
           <Sidebar
             profiles={profiles}
             activeId={activeId}
+            activeProfile={activeProfile}
             editingProfile={editingProfile}
             setEditingProfile={setEditingProfile}
             onClose={() => { setPanel(null); setEditingProfile(null); }}
             onSaveProfile={handleSaveProfile}
             onDeleteProfile={handleDeleteProfile}
             onCreateNew={() => setEditingProfile({ ...mkProfile(), _isNew: true })}
+            onSetActive={(id) => { setActiveId(id); clearNews(); }}
+            onFetchNews={() => fetchNews(activeProfile)}
+            loading={loading}
           />
         )}
 

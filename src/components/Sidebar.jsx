@@ -1,7 +1,7 @@
 import { C } from "../lib/theme";
 import { ProfileEditor } from "./ProfileEditor";
 
-export function Sidebar({ profiles, activeId, editingProfile, setEditingProfile, onClose, onSaveProfile, onDeleteProfile, onCreateNew }) {
+export function Sidebar({ profiles, activeId, activeProfile, editingProfile, setEditingProfile, onClose, onSaveProfile, onDeleteProfile, onCreateNew, onSetActive, onFetchNews, loading }) {
   return (
     <aside className="gz-aside">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px 14px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "inherit", zIndex: 1 }}>
@@ -24,22 +24,38 @@ export function Sidebar({ profiles, activeId, editingProfile, setEditingProfile,
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 9, paddingTop: 14 }}>
+
+            {activeProfile?.feeds?.length > 0 && (
+              <button onClick={onFetchNews} disabled={loading}
+                style={{ background: loading ? C.border : C.green, color: loading ? C.muted : "#000", border: "none", borderRadius: 8, padding: "13px", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: loading ? "not-allowed" : "pointer", minHeight: 48, width: "100%" }}>
+                {loading ? "…" : `↻ Aggiorna`}
+              </button>
+            )}
+
             {profiles.map(p => (
-              <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${p.id === activeId ? C.green : C.border}` }}>
+              <div key={p.id}
+                onClick={() => { onSetActive(p.id); onClose(); }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${p.id === activeId ? C.green : C.border}`, cursor: "pointer" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "Crimson Pro, serif", fontSize: 16, color: C.text }}>{p.name}</div>
+                  <div style={{ fontFamily: "Crimson Pro, serif", fontSize: 16, color: p.id === activeId ? C.green : C.text }}>{p.name}</div>
                   <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>
                     {p.feeds?.length ? `${p.feeds.length} feed` : "Nessun feed"}
                     {p.interests?.length > 0 && <span style={{ color: C.green }}> · ★{p.interests.length}</span>}
                     {p.avoids?.length > 0 && <span style={{ color: C.danger }}> · ✕{p.avoids.length}</span>}
                   </div>
                 </div>
-                <button onClick={() => setEditingProfile(p)}
-                  style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 14, padding: "5px 11px", minHeight: 34, fontFamily: "Crimson Pro, serif", flexShrink: 0 }}>Modifica</button>
+                <button
+                  onClick={e => { e.stopPropagation(); setEditingProfile(p); }}
+                  style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 14, padding: "5px 11px", minHeight: 34, fontFamily: "Crimson Pro, serif", flexShrink: 0 }}>
+                  Modifica
+                </button>
               </div>
             ))}
+
             <button onClick={onCreateNew}
-              style={{ marginTop: 4, padding: "13px", background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 8, color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 16, cursor: "pointer", minHeight: 48 }}>+ Aggiungi profilo</button>
+              style={{ marginTop: 4, padding: "13px", background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 8, color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 16, cursor: "pointer", minHeight: 48 }}>
+              + Aggiungi profilo
+            </button>
           </div>
         )}
       </div>
