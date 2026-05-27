@@ -77,8 +77,9 @@ body{margin:0;background:#000;overflow-x:hidden}
 @media(min-width:900px){.gz-card{flex-direction:column}}
 @media(hover:hover){.gz-card:hover{border-color:#22c55e!important;transform:translateY(-2px)}}
 
-.gz-card-img{width:92px;height:92px;object-fit:cover;flex-shrink:0}
-@media(min-width:900px){.gz-card-img{width:100%;height:auto;aspect-ratio:16/9}}
+/* mobile: allineamento top con il testo (margin-top = padding card-body) */
+.gz-card-img{width:92px;height:92px;object-fit:cover;object-position:top center;flex-shrink:0;align-self:flex-start;margin-top:11px}
+@media(min-width:900px){.gz-card-img{width:100%;height:auto;aspect-ratio:16/9;align-self:auto;margin-top:0;object-position:center}}
 
 .gz-card-stripe{width:3px;flex-shrink:0;align-self:stretch}
 @media(min-width:900px){.gz-card-stripe{width:100%;height:2px;align-self:auto}}
@@ -429,15 +430,18 @@ export default function App() {
         .flatMap(r => r.value)
         .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
 
-      const failed = results.filter(r => r.status === "rejected").length;
+      const failedHosts = results
+        .map((r, i) => r.status === "rejected" ? profile.feeds[i] : null)
+        .filter(Boolean)
+        .map(u => { try { return new URL(u).hostname.replace("www.", ""); } catch { return u; } });
 
       setNews(articles);
       setFetchedAt(new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }));
 
       if (articles.length === 0)
-        setError(failed ? "Impossibile caricare i feed. Verifica gli URL." : "Nessuna notizia trovata.");
-      else if (failed)
-        setError(`${failed} feed non caricato/i.`);
+        setError(failedHosts.length ? `Feed non raggiungibili: ${failedHosts.join(", ")}` : "Nessuna notizia trovata.");
+      else if (failedHosts.length)
+        setError(`Feed non caricati: ${failedHosts.join(", ")}`);
     } catch (e) {
       setError(e.message || "Errore di rete.");
     } finally {
