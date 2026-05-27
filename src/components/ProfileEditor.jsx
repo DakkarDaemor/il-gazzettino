@@ -2,6 +2,7 @@ import { useState } from "react";
 import { C } from "../lib/theme";
 import { SUGGESTED_FEEDS } from "../config";
 import { KeywordSection } from "./KeywordSection";
+import { FeedSearchPanel } from "./FeedSearchPanel";
 
 export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
   const [form, setForm] = useState({
@@ -69,6 +70,11 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
             ))}
           </div>
         )}
+
+        <div>
+          <span style={{ ...lbl, marginBottom: 6 }}>Cerca feed per argomento</span>
+          <FeedSearchPanel existingFeeds={form.feeds} onAdd={addFeed} />
+        </div>
 
         {available.length > 0 && (
           <div>

@@ -6,7 +6,12 @@
       "Bash(git commit *)",
       "Bash(Get-ChildItem -Path \"d:\\\\__APP__\\\\il-gazzettino\" -Recurse -File)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "Bash(grep -i -E \"\\(proposta|idea|digest|summar|classif|raccomand|personali|haiku|sonnet|costo|token|€|\\\\$\\)\")",
+      "Bash(grep -o '\"text\":\"[^\"]*\"' \"C:\\\\Users\\\\dakka\\\\.claude\\\\projects\\\\d----APP---il-gazzettino\\\\40b587ac-757f-4b42-8651-53ee5d2c1bed.jsonl\" | grep -i \"brief\\\\|digest\\\\|domande\\\\|ricerca\\\\|deep\" | head -20)",
+      "Read(//c/Users/dakka/.claude/projects/d----APP---il-gazzettino/**)",
+      "Bash(git checkout *)",
+      "Bash(npx vite *)"
     ]
   }
 }
