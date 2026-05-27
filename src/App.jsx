@@ -11,6 +11,34 @@ const storage = {
 
 const CORS_PROXY = "/api/rss?url=";
 
+function titleWords(title) {
+  return new Set(
+    title.toLowerCase().replace(/[^\wàèéìòù\s]/g, " ").split(/\s+/).filter(w => w.length > 3)
+  );
+}
+
+function deduplicate(articles) {
+  const kept = [];
+  for (const a of articles) {
+    const wa = titleWords(a.title);
+    const dupeIdx = kept.findIndex(k => {
+      const wk = titleWords(k.title);
+      const inter = [...wa].filter(w => wk.has(w)).length;
+      const union = new Set([...wa, ...wk]).size;
+      return union > 0 && inter / union >= 0.6;
+    });
+    if (dupeIdx === -1) {
+      kept.push(a);
+    } else {
+      const existing = kept[dupeIdx];
+      const aBetter = (!existing.image && a.image) ||
+        (a.description.length > existing.description.length && existing.image === a.image);
+      if (aBetter) kept[dupeIdx] = a;
+    }
+  }
+  return kept;
+}
+
 function parseFeed(xmlText, feedUrl) {
   const doc = new DOMParser().parseFromString(xmlText, "text/xml");
   if (doc.querySelector("parsererror")) throw new Error("Feed XML non valido");
@@ -425,10 +453,12 @@ export default function App() {
         })
       );
 
-      const articles = results
-        .filter(r => r.status === "fulfilled")
-        .flatMap(r => r.value)
-        .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+      const articles = deduplicate(
+        results
+          .filter(r => r.status === "fulfilled")
+          .flatMap(r => r.value)
+          .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+      );
 
       const failedHosts = results
         .map((r, i) => r.status === "rejected" ? profile.feeds[i] : null)
