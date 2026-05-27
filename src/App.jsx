@@ -90,9 +90,9 @@ body{margin:0;background:#000;overflow-x:hidden}
 .gz-card-title{margin:0;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#ebebeb;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media(min-width:900px){.gz-card-title{font-size:18px;-webkit-line-clamp:3}}
 
-/* Descrizione: 16px mobile, 18px desktop */
-.gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:16px;color:#aaaaaa;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-@media(min-width:900px){.gz-card-desc{font-size:18px;line-height:1.65;-webkit-line-clamp:3}}
+/* Descrizione: 14px mobile, 16px desktop */
+.gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:14px;color:#aaaaaa;line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(min-width:900px){.gz-card-desc{font-size:16px;line-height:1.65;-webkit-line-clamp:3}}
 
 /* Sidebar */
 .gz-aside{position:fixed;inset:0;z-index:200;overflow-y:auto;background:#000;border-right:none}
