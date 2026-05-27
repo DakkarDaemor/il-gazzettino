@@ -119,7 +119,7 @@ export default function App() {
           )}
 
           {error && (
-            <div style={{ background: "#130808", border: `1px solid ${C.danger}44`, borderRadius: 8, padding: "13px 17px", color: "#f87171", fontSize: 16, marginBottom: 16 }}>{error}</div>
+            <div style={{ background: "#400", border: `1px solid ${C.danger}44`, borderRadius: 8, padding: "13px 17px", color: "#f87171", fontSize: 16, marginBottom: 16 }}>{error}</div>
           )}
 
           {loading && (
