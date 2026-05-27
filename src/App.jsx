@@ -9,7 +9,45 @@ const storage = {
   },
 };
 
-const RSS2JSON = "https://api.rss2json.com/v1/api.json";
+const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+
+function parseFeed(xmlText, feedUrl) {
+  const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+  if (doc.querySelector("parsererror")) throw new Error("Feed XML non valido");
+
+  const isAtom = !!doc.querySelector("feed");
+  const sourceName =
+    doc.querySelector(isAtom ? "feed > title" : "channel > title")?.textContent?.trim() ||
+    new URL(feedUrl).hostname.replace("www.", "");
+
+  const entries = [...doc.querySelectorAll(isAtom ? "feed > entry" : "channel > item")];
+
+  return entries.map(e => {
+    const txt = (...sels) => { for (const s of sels) { const v = e.querySelector(s)?.textContent?.trim(); if (v) return v; } return ""; };
+
+    const rawDesc = isAtom ? txt("content", "summary") : txt("description", "content\\:encoded");
+    const div = document.createElement("div");
+    div.innerHTML = rawDesc;
+    const description = (div.textContent || "").replace(/\s+/g, " ").trim().slice(0, 280);
+
+    let url = "";
+    if (isAtom) url = e.querySelector("link[rel='alternate']")?.getAttribute("href") || e.querySelector("link:not([rel='enclosure'])")?.getAttribute("href") || txt("link");
+    else url = txt("link");
+
+    let image = e.querySelector("media\\:content")?.getAttribute("url") || e.querySelector("media\\:thumbnail")?.getAttribute("url") || null;
+    if (!image) { const enc = e.querySelector("enclosure"); if (enc?.getAttribute("type")?.startsWith("image")) image = enc.getAttribute("url"); }
+    if (!image) { const m = rawDesc.match(/<img[^>]+src=["']([^"']+)["']/i); if (m) image = m[1]; }
+
+    return {
+      title: txt("title"),
+      url,
+      publishedAt: isAtom ? txt("published", "updated") : txt("pubDate", "dc\\:date"),
+      description,
+      image,
+      source: { name: sourceName },
+    };
+  });
+}
 
 const C = {
   bg: "#0f0e0c", card: "#141210", cardHover: "#1c1916",
@@ -311,22 +349,10 @@ export default function App() {
     try {
       const results = await Promise.allSettled(
         profile.feeds.map(async (feedUrl) => {
-          const url = `${RSS2JSON}?rss_url=${encodeURIComponent(feedUrl)}&count=20`;
-          const res = await fetch(url);
+          const res = await fetch(CORS_PROXY + encodeURIComponent(feedUrl));
           if (!res.ok) throw new Error("Feed non raggiungibile");
-          const data = await res.json();
-          if (data.status !== "ok") throw new Error(data.message || "Feed non valido");
-          const sourceName = data.feed?.title || new URL(feedUrl).hostname.replace("www.", "");
-          return data.items.map(item => ({
-            title: item.title,
-            url: item.link,
-            publishedAt: item.pubDate,
-            description: item.description
-              ? item.description.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 280)
-              : "",
-            image: item.thumbnail || (item.enclosure?.type?.startsWith("image") ? item.enclosure.link : null) || null,
-            source: { name: sourceName },
-          }));
+          const text = await res.text();
+          return parseFeed(text, feedUrl);
         })
       );
 
