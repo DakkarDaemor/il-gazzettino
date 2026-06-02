@@ -1,7 +1,7 @@
 import { C } from "../lib/theme";
 import { ProfileEditor } from "./ProfileEditor";
 
-export function Sidebar({ profiles, activeId, activeProfile, editingProfile, setEditingProfile, onClose, onSaveProfile, onDeleteProfile, onCreateNew, onSetActive, onFetchNews, loading }) {
+export function Sidebar({ profiles, activeId, activeProfile, editingProfile, setEditingProfile, onClose, onSaveProfile, onDeleteProfile, onCreateNew, onSetActive }) {
   return (
     <aside className="gz-aside">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px 14px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "inherit", zIndex: 1 }}>
@@ -25,14 +25,7 @@ export function Sidebar({ profiles, activeId, activeProfile, editingProfile, set
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 9, paddingTop: 14 }}>
 
-            {activeProfile?.feeds?.length > 0 && (
-              <button onClick={onFetchNews} disabled={loading}
-                style={{ background: loading ? C.border : C.green, color: loading ? C.muted : "#000", border: "none", borderRadius: 8, padding: "13px", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: loading ? "not-allowed" : "pointer", minHeight: 48, width: "100%" }}>
-                {loading ? "…" : `↻ Aggiorna`}
-              </button>
-            )}
-
-            {profiles.map(p => (
+{profiles.map(p => (
               <div key={p.id}
                 onClick={() => { onSetActive(p.id); onClose(); }}
                 style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: C.bg, borderRadius: 8, border: `1px solid ${p.id === activeId ? C.green : C.border}`, cursor: "pointer" }}>

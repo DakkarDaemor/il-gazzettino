@@ -1,6 +1,6 @@
-# Il Gazzettino 📰
+# NotiziAI 📰
 
-Aggregatore di notizie personalizzato. Crea profili tematici o geografici e consulta il tuo gazzettino aggiornato.
+Aggregatore di notizie personalizzato. Crea profili tematici o geografici e consulta il tuo NotiziAI aggiornato.
 
 ## Funzionalità
 

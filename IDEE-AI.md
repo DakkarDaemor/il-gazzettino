@@ -1,4 +1,4 @@
-# Possibili evoluzioni AI — Il Gazzettino
+# Possibili evoluzioni AI — NotiziAI
 
 Analisi concreta, senza stime vaghe. Prezzi basati su Claude API (Haiku per uso leggero, Sonnet per qualità alta).
 

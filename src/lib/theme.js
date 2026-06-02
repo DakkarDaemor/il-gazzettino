@@ -14,7 +14,7 @@ export const C = {
 
 const GLOBAL_CSS = `
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#000;overflow-x:hidden}
+body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 
 .gz-grid{display:grid;gap:10px;grid-template-columns:1fr}
 @media(min-width:480px){.gz-grid{grid-template-columns:repeat(2,1fr)}}

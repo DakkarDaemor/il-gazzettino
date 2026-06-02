@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { C, injectTheme } from "./lib/theme";
 import { matchesAny } from "./lib/articles";
 import { useProfiles, mkProfile } from "./hooks/useProfiles";
 import { useNews } from "./hooks/useNews";
+import { usePullToRefresh } from "./hooks/usePullToRefresh";
 import { ArticleCard } from "./components/ArticleCard";
 import { Sidebar } from "./components/Sidebar";
 
@@ -29,6 +30,12 @@ export default function App() {
 
   const togglePanel = (p) => { setPanel(prev => prev === p ? null : p); setEditingProfile(null); };
 
+  const doRefresh = useCallback(() => {
+    if (activeProfile?.feeds?.length) fetchNews(activeProfile);
+  }, [activeProfile, fetchNews]);
+
+  const { dist, ready } = usePullToRefresh(doRefresh, loading || !activeProfile?.feeds?.length);
+
   const avoids = activeProfile?.avoids || [];
   const interests = activeProfile?.interests || [];
   const displayedNews = news
@@ -50,15 +57,27 @@ export default function App() {
       <header style={{ position: "sticky", top: 0, zIndex: 100, background: C.bg, borderBottom: `1px solid ${C.border}` }}>
         <div style={{ padding: "10px 16px 9px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 22, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>IL GAZZETTINO</h1>
+            <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 22, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>NOTIZIAI</h1>
             <span className="gz-date" style={{ fontSize: 12, color: C.muted, letterSpacing: 1.1 }}>
               {new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" }).toUpperCase()}
             </span>
           </div>
-          <button onClick={() => togglePanel("profiles")} title="Profili"
-            style={{ background: panel === "profiles" ? C.greenDim : "none", border: `1px solid ${panel === "profiles" ? C.green + "44" : "transparent"}`, borderRadius: 6, color: panel === "profiles" ? C.green : C.muted, cursor: "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
+          <div style={{ display: "flex", gap: 4 }}>
+            {activeProfile?.feeds?.length > 0 && (
+              <button onClick={doRefresh} disabled={loading} title="Aggiorna"
+                style={{ background: "none", border: "1px solid transparent", borderRadius: 6, color: loading ? C.border : C.muted, cursor: loading ? "not-allowed" : "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>↻</button>
+            )}
+            <button onClick={() => togglePanel("profiles")} title="Profili"
+              style={{ background: panel === "profiles" ? C.greenDim : "none", border: `1px solid ${panel === "profiles" ? C.green + "44" : "transparent"}`, borderRadius: 6, color: panel === "profiles" ? C.green : C.muted, cursor: "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
+          </div>
         </div>
       </header>
+
+      {dist > 0 && (
+        <div style={{ position: "fixed", top: 51, left: 0, right: 0, height: 38, zIndex: 99, display: "flex", alignItems: "center", justifyContent: "center", background: C.bg, borderBottom: `1px solid ${ready ? C.green : C.border}`, pointerEvents: "none", transition: "border-color 0.1s" }}>
+          <span style={{ color: ready ? C.green : C.muted, fontSize: 16, display: "inline-block", transform: `rotate(${Math.min(dist / 72 * 180, 180)}deg)`, transition: "color 0.1s" }}>↓</span>
+        </div>
+      )}
 
       <div style={{ display: "flex" }}>
         {panel && (
@@ -82,7 +101,7 @@ export default function App() {
           {profiles.length === 0 && (
             <div style={{ textAlign: "center", padding: "80px 20px" }}>
               <div style={{ fontFamily: "Playfair Display, serif", fontSize: 50, color: C.green, marginBottom: 16, opacity: 0.4 }}>✦</div>
-              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 22, color: C.text, marginBottom: 8 }}>Benvenuto nel Gazzettino</p>
+              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 22, color: C.text, marginBottom: 8 }}>Benvenuto in NotiziAI</p>
               <p style={{ fontSize: 17, color: C.muted, marginBottom: 24 }}>Crea un profilo e aggiungi i feed RSS delle tue fonti preferite.</p>
               <button onClick={() => { setEditingProfile({ ...mkProfile(), _isNew: true }); setPanel("profiles"); }}
                 style={{ background: C.green, border: "none", borderRadius: 8, padding: "13px 30px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: "pointer", minHeight: 50 }}>+ Crea profilo</button>
@@ -127,7 +146,9 @@ export default function App() {
             <div style={{ textAlign: "center", padding: "70px 20px" }}>
               <div style={{ fontFamily: "Playfair Display, serif", fontSize: 42, color: C.green, opacity: 0.15, marginBottom: 16 }}>◈</div>
               <p style={{ fontFamily: "Playfair Display, serif", fontSize: 18, color: C.text, marginBottom: 7 }}>{activeProfile.name}</p>
-              <p style={{ fontSize: 16, color: C.muted }}>Premi <span style={{ color: C.green }}>↻ Aggiorna</span> per caricare le notizie.</p>
+              <p style={{ fontSize: 15, color: C.muted, marginBottom: 28 }}>Trascina giù per aggiornare il feed aperto</p>
+              <button onClick={doRefresh}
+                style={{ background: C.green, border: "none", borderRadius: 8, padding: "13px 30px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: "pointer", minHeight: 50 }}>↻ Aggiorna</button>
             </div>
           )}
 

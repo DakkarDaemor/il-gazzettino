@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { storage } from "../lib/storage";
 
-export const mkProfile = (name = "Nuovo gazzettino") => ({
+export const mkProfile = (name = "Nuovo NotiziAI") => ({
   id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
   name,
   feeds: [],

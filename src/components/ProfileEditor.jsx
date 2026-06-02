@@ -40,7 +40,7 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <label style={lbl}>Nome gazzettino</label>
+        <label style={lbl}>Nome NotiziAI</label>
         <input style={inp} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </div>
 
