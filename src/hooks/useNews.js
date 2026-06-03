@@ -14,7 +14,8 @@ export function useNews() {
     setLoading(true); setError(""); setNews([]);
     try {
       const results = await Promise.allSettled(
-        profile.feeds.map(async (feedUrl) => {
+        profile.feeds.map(async (feed) => {
+          const feedUrl = typeof feed === "string" ? feed : feed.url;
           const res = await fetch(CORS_PROXY + encodeURIComponent(feedUrl));
           if (!res.ok) throw new Error("Feed non raggiungibile");
           const text = await res.text();
@@ -30,7 +31,11 @@ export function useNews() {
       );
 
       const failedHosts = results
-        .map((r, i) => r.status === "rejected" ? profile.feeds[i] : null)
+        .map((r, i) => {
+          if (r.status !== "rejected") return null;
+          const f = profile.feeds[i];
+          return typeof f === "string" ? f : f.url;
+        })
         .filter(Boolean)
         .map(u => { try { return new URL(u).hostname.replace("www.", ""); } catch { return u; } });
 

@@ -22,7 +22,14 @@ export function useProfiles() {
           const parsed = JSON.parse(p.value);
           const migrated = parsed.map(pr => ({
             id: pr.id, name: pr.name,
-            feeds: pr.feeds || [],
+            feeds: (pr.feeds || []).map(f => {
+              if (typeof f === "string") {
+                let label = f;
+                try { label = new URL(f).hostname.replace("www.", ""); } catch {}
+                return { url: f, label };
+              }
+              return f;
+            }),
             interests: pr.interests || [],
             avoids: pr.avoids || [],
           }));

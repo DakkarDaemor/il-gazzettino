@@ -143,12 +143,27 @@ export default function App() {
           )}
 
           {!loading && news.length === 0 && !error && activeProfile?.feeds?.length > 0 && (
-            <div style={{ textAlign: "center", padding: "70px 20px" }}>
-              <div style={{ fontFamily: "Playfair Display, serif", fontSize: 42, color: C.green, opacity: 0.15, marginBottom: 16 }}>◈</div>
-              <p style={{ fontFamily: "Playfair Display, serif", fontSize: 18, color: C.text, marginBottom: 7 }}>{activeProfile.name}</p>
-              <p style={{ fontSize: 15, color: C.muted, marginBottom: 28 }}>Trascina giù per aggiornare il feed aperto</p>
-              <button onClick={doRefresh}
-                style={{ background: C.green, border: "none", borderRadius: 8, padding: "13px 30px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 16, cursor: "pointer", minHeight: 50 }}>↻ Aggiorna</button>
+            <div>
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+                <span style={{ fontFamily: "Playfair Display, serif", fontSize: 14, color: C.muted, textTransform: "uppercase", letterSpacing: 1.5 }}>
+                  Fonti · {activeProfile.feeds.length}
+                </span>
+                <button onClick={doRefresh}
+                  style={{ background: C.green, border: "none", borderRadius: 6, padding: "8px 18px", color: "#000", fontFamily: "Playfair Display, serif", fontWeight: 700, fontSize: 14, cursor: "pointer", minHeight: 36 }}>
+                  ↻ Carica notizie
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {activeProfile.feeds.map(feed => (
+                  <div key={feed.url} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", background: C.card, border: `1px solid ${C.border}`, borderRadius: 8 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.border, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 15, color: C.text, fontFamily: "Crimson Pro, serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{feed.label}</div>
+                      <div style={{ fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>{feed.url}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

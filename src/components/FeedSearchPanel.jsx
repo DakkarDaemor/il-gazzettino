@@ -34,7 +34,8 @@ export function FeedSearchPanel({ existingFeeds, onAdd }) {
     }
   };
 
-  const available = results.filter(r => !existingFeeds.includes(r.url));
+  const existingUrls = existingFeeds.map(f => typeof f === "string" ? f : f.url);
+  const available = results.filter(r => !existingUrls.includes(r.url));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -82,7 +83,7 @@ export function FeedSearchPanel({ existingFeeds, onAdd }) {
                   {fmtSubscribers(r.subscribers) && <span style={{ fontSize: 12, color: C.green }}>{fmtSubscribers(r.subscribers)}</span>}
                 </div>
               </div>
-              <button onClick={() => onAdd(r.url)}
+              <button onClick={() => onAdd(r.url, r.title)}
                 style={{ background: "transparent", border: `1px solid ${C.green}55`, borderRadius: 5, color: C.green, cursor: "pointer", fontSize: 16, fontWeight: 700, padding: "4px 13px", flexShrink: 0, minHeight: 32, fontFamily: "Playfair Display, serif" }}>+</button>
             </div>
           ))}

@@ -19,18 +19,20 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
   const lbl = { display: "block", fontSize: 13, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
   const divider = <div style={{ height: 1, background: C.border }} />;
 
-  const addFeed = (url) => {
+  const addFeed = (url, label) => {
     const u = (url ?? newFeedUrl).trim();
-    if (!u || form.feeds.includes(u)) return;
-    setForm(f => ({ ...f, feeds: [...f.feeds, u] }));
+    if (!u || form.feeds.some(f => f.url === u)) return;
+    let lbl = label?.trim() || "";
+    if (!lbl) { try { lbl = new URL(u).hostname.replace("www.", ""); } catch { lbl = u; } }
+    setForm(f => ({ ...f, feeds: [...f.feeds, { url: u, label: lbl }] }));
     if (!url) setNewFeedUrl("");
   };
 
-  const removeFeed = (url) => setForm(f => ({ ...f, feeds: f.feeds.filter(u => u !== url) }));
+  const removeFeed = (url) => setForm(f => ({ ...f, feeds: f.feeds.filter(fd => fd.url !== url) }));
   const addKw = (list, kw) => { if (kw && !form[list].includes(kw)) setForm(f => ({ ...f, [list]: [...f[list], kw] })); };
   const removeKw = (list, kw) => setForm(f => ({ ...f, [list]: f[list].filter(k => k !== kw) }));
 
-  const available = SUGGESTED_FEEDS.filter(s => !form.feeds.includes(s.url));
+  const available = SUGGESTED_FEEDS.filter(s => !form.feeds.some(f => f.url === s.url));
 
   const btn = (style) => ({
     border: "none", borderRadius: 6, padding: "12px 15px", fontFamily: "Playfair Display, serif",
@@ -61,10 +63,13 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
 
         {form.feeds.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 11 }}>
-            {form.feeds.map(url => (
-              <div key={url} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 13px" }}>
-                <span style={{ flex: 1, fontSize: 13, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{url}</span>
-                <button onClick={() => removeFeed(url)}
+            {form.feeds.map(feed => (
+              <div key={feed.url} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 13px" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{feed.label}</div>
+                  <div style={{ fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1 }}>{feed.url}</div>
+                </div>
+                <button onClick={() => removeFeed(feed.url)}
                   style={{ background: "transparent", border: `1px solid ${C.danger}55`, borderRadius: 4, color: C.danger, cursor: "pointer", fontSize: 13, padding: "4px 9px", flexShrink: 0, minHeight: 30 }}>Rimuovi</button>
               </div>
             ))}
@@ -81,7 +86,7 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
             <span style={{ ...lbl, marginBottom: 6 }}>Suggerimenti</span>
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               {available.map(s => (
-                <button key={s.url} onClick={() => addFeed(s.url)}
+                <button key={s.url} onClick={() => addFeed(s.url, s.label)}
                   style={{ background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 6, padding: "10px 13px", color: C.muted, fontFamily: "Crimson Pro, serif", fontSize: 15, cursor: "pointer", textAlign: "left", minHeight: 42 }}>
                   + {s.label}
                 </button>
