@@ -104,7 +104,7 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
         keywords={form.interests}
         onAdd={kw => addKw("interests", kw)}
         onRemove={kw => removeKw("interests", kw)}
-        placeholder="es. tecnologia, politica…"
+        placeholder='es. tecnologia, "serie A"…'
       />
 
       <KeywordSection
