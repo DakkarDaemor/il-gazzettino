@@ -10,7 +10,7 @@ export function ArticleCard({ article, highlighted }) {
   return (
     <a href={article.url} target="_blank" rel="noopener noreferrer"
       className="gz-card"
-      style={{ border: `1px solid ${highlighted ? C.green : C.border}` }}>
+      style={{ border: `1px solid ${highlighted ? C.green + "88" : C.border}` }}>
 
       {hasImg
         ? <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
