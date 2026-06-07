@@ -11,7 +11,18 @@
       "Bash(grep -o '\"text\":\"[^\"]*\"' \"C:\\\\Users\\\\dakka\\\\.claude\\\\projects\\\\d----APP---il-gazzettino\\\\40b587ac-757f-4b42-8651-53ee5d2c1bed.jsonl\" | grep -i \"brief\\\\|digest\\\\|domande\\\\|ricerca\\\\|deep\" | head -20)",
       "Read(//c/Users/dakka/.claude/projects/d----APP---il-gazzettino/**)",
       "Bash(git checkout *)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "Bash(npm run *)",
+      "Bash(start http://localhost:5173)",
+      "Bash(where playwright *)",
+      "Bash(npx playwright *)",
+      "Bash(node -e \"require\\('playwright'\\)\")",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(npx --yes playwright@latest --version)",
+      "Bash(npm list *)",
+      "Read(//c/Users/dakka/**)",
+      "Bash(node -e \"const {chromium} = require\\('C:/Users/dakka/AppData/Local/npm-cache/_npx/705bc6b22212b352/node_modules/playwright'\\); console.log\\('ok'\\)\")",
+      "Bash(node)"
     ]
   }
 }
