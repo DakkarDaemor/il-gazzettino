@@ -57,7 +57,9 @@ export default function App() {
       <header style={{ position: "sticky", top: 0, zIndex: 100, background: C.bg, borderBottom: `1px solid ${C.border}` }}>
         <div style={{ padding: "10px 16px 9px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 22, fontWeight: 900, color: C.green, letterSpacing: -0.5 }}>NOTIZIAI</h1>
+            <h1 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 22, fontWeight: 900, letterSpacing: -0.5 }}>
+              <span style={{ color: C.green }}>NOTIZI</span><span style={{ color: C.orange }}>AI</span>
+            </h1>
             <span className="gz-date" style={{ fontSize: 12, color: C.muted, letterSpacing: 1.1 }}>
               {new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" }).toUpperCase()}
             </span>

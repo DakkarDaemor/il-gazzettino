@@ -10,6 +10,7 @@ export const C = {
   muted:    "#888888",
   border:   "#1e1e1e",
   danger:   "#ef4444",
+  orange:   "#f97316",
 };
 
 const GLOBAL_CSS = `
