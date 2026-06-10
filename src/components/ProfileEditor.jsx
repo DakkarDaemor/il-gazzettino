@@ -77,13 +77,13 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
         )}
 
         <div>
-          <span style={{ ...lbl, marginBottom: 6 }}>Cerca feed per argomento</span>
+          <span style={{ ...labelStyle, marginBottom: 6 }}>Cerca feed per argomento</span>
           <FeedSearchPanel existingFeeds={form.feeds} onAdd={addFeed} />
         </div>
 
         {available.length > 0 && (
           <div>
-            <span style={{ ...lbl, marginBottom: 6 }}>Suggerimenti</span>
+            <span style={{ ...labelStyle, marginBottom: 6 }}>Suggerimenti</span>
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               {available.map(s => (
                 <button key={s.url} onClick={() => addFeed(s.url, s.label)}
