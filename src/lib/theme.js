@@ -25,10 +25,14 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 @media(hover:hover){.gz-card:hover{border-color:#22c55e!important;transform:translateY(-2px)}}
 
 .gz-card-img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;object-position:center}
+.gz-card-imgwrap{position:relative;flex-shrink:0}
+.gz-card-imggrad{position:absolute;inset:auto 0 0 0;height:60%;background:linear-gradient(to bottom,transparent,#0d0d0d);pointer-events:none;transition:opacity .35s ease}
+@media(min-width:900px){.gz-card-imggrad{display:none}}
 
 .gz-card-stripe{width:100%;height:2px}
 
-.gz-card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:9px;flex:1;min-width:0}
+.gz-card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:9px;flex:1;min-width:0;position:relative;z-index:1;margin-top:-4rem;transition:margin-top .35s ease}
+@media(min-width:900px){.gz-card-body{margin-top:0;transition:none}}
 
 .gz-card-title{margin:0;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#ebebeb;line-height:1.3;display:block;overflow:visible}
 @media(min-width:900px){.gz-card-title{font-size:18px}}
@@ -42,6 +46,8 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 .gz-date{display:none}
 @media(min-width:480px){.gz-date{display:inline}}
 
+.gz-card--expanded .gz-card-imggrad{opacity:0}
+.gz-card--expanded .gz-card-body{margin-top:0}
 .gz-card--expanded .gz-card-desc{display:block;line-height:1.4}
 .gz-card-read-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#22c55e;text-decoration:none;font-family:'Crimson Pro',serif;font-weight:600}
 .gz-card-read-link:hover{text-decoration:underline}

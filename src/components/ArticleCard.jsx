@@ -15,7 +15,10 @@ export function ArticleCard({ article, highlighted }) {
       onClick={() => setExpanded(e => !e)}>
 
       {hasImg
-        ? <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
+        ? <div className="gz-card-imgwrap">
+            <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
+            <div className="gz-card-imggrad" />
+          </div>
         : <div className="gz-card-stripe" style={{ background: highlighted ? C.green : "#2a2a2a" }} />
       }
 
