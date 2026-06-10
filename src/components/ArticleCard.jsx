@@ -4,13 +4,15 @@ import { timeAgo } from "../lib/articles";
 
 export function ArticleCard({ article, highlighted }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const hasImg = article.image && !imgFailed;
   const domain = (() => { try { return new URL(article.url).hostname.replace("www.", ""); } catch { return ""; } })();
 
   return (
-    <a href={article.url} target="_blank" rel="noopener noreferrer"
-      className="gz-card"
-      style={{ border: `1px solid ${highlighted ? C.green + "88" : C.border}` }}>
+    <div
+      className={`gz-card${expanded ? " gz-card--expanded" : ""}`}
+      style={{ border: `1px solid ${highlighted ? C.green + "88" : C.border}`, cursor: "pointer" }}
+      onClick={() => setExpanded(e => !e)}>
 
       {hasImg
         ? <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
@@ -29,11 +31,18 @@ export function ArticleCard({ article, highlighted }) {
 
         {article.description && <p className="gz-card-desc">{article.description}</p>}
 
-        <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", paddingTop: 4 }}>
+        <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4 }}>
           <span style={{ fontSize: 12, color: C.muted }}>{domain}</span>
-          <span style={{ fontSize: 13, color: C.green }}>↗</span>
+          {expanded
+            ? <a href={article.url} target="_blank" rel="noopener noreferrer"
+                className="gz-card-read-link"
+                onClick={e => e.stopPropagation()}>
+                Leggi su {article.source?.name || domain} ↗
+              </a>
+            : <span style={{ fontSize: 13, color: C.green }}>↗</span>
+          }
         </div>
       </div>
-    </a>
+    </div>
   );
 }

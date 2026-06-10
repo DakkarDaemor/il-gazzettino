@@ -46,6 +46,11 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 .gz-date{display:none}
 @media(min-width:480px){.gz-date{display:inline}}
 
+.gz-card--expanded .gz-card-title{-webkit-line-clamp:unset;overflow:visible;display:block}
+.gz-card--expanded .gz-card-desc{-webkit-line-clamp:unset;overflow:visible;display:block;line-height:1.6}
+.gz-card-read-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#22c55e;text-decoration:none;font-family:'Crimson Pro',serif;font-weight:600}
+.gz-card-read-link:hover{text-decoration:underline}
+
 input:focus,textarea:focus{outline:none;border-color:#22c55e!important}
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:#000}
