@@ -35,10 +35,10 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 @media(min-width:900px){.gz-card-body{padding:14px 16px 16px;gap:9px}}
 
 .gz-card-title{margin:0;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#ebebeb;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-@media(min-width:900px){.gz-card-title{font-size:18px;-webkit-line-clamp:4}}
+@media(min-width:900px){.gz-card-title{font-size:18px;display:block;overflow:visible;-webkit-line-clamp:unset}}
 
 .gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:14px;color:#aaaaaa;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-@media(min-width:900px){.gz-card-desc{font-size:16px;line-height:1;-webkit-line-clamp:4}}
+@media(min-width:900px){.gz-card-desc{font-size:16px;line-height:1.5;display:block;overflow:visible;-webkit-line-clamp:unset}}
 
 .gz-aside{position:fixed;inset:0;z-index:200;overflow-y:auto;background:#000;border-right:none}
 @media(min-width:640px){.gz-aside{position:sticky;inset:auto;top:0;width:310px;flex-shrink:0;max-height:100vh;z-index:10;background:#0d0d0d;border-right:1px solid #1e1e1e}}
@@ -47,7 +47,7 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 @media(min-width:480px){.gz-date{display:inline}}
 
 .gz-card--expanded .gz-card-title{-webkit-line-clamp:unset;overflow:visible;display:block}
-.gz-card--expanded .gz-card-desc{-webkit-line-clamp:unset;overflow:visible;display:block;line-height:1.6}
+.gz-card--expanded .gz-card-desc{-webkit-line-clamp:unset;overflow:visible;display:block;line-height:1.4}
 .gz-card-read-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#22c55e;text-decoration:none;font-family:'Crimson Pro',serif;font-weight:600}
 .gz-card-read-link:hover{text-decoration:underline}
 
