@@ -16,7 +16,7 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
   const isNew = !!profile._isNew;
 
   const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 13px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 16, outline: "none", boxSizing: "border-box" };
-  const lbl = { display: "block", fontSize: 13, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
+  const labelStyle = { display: "block", fontSize: 13, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
   const divider = <div style={{ height: 1, background: C.border }} />;
 
   const addFeed = (url, label) => {
@@ -42,14 +42,14 @@ export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <label style={lbl}>Nome NotiziAI</label>
+        <label style={labelStyle}>Nome NotiziAI</label>
         <input style={inp} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </div>
 
       {divider}
 
       <div>
-        <label style={lbl}>Feed RSS</label>
+        <label style={labelStyle}>Feed RSS</label>
         <div style={{ display: "flex", gap: 6, marginBottom: 9 }}>
           <input style={{ ...inp, flex: 1, width: "auto" }}
             placeholder="https://esempio.it/rss.xml"

@@ -26,7 +26,7 @@ export function KeywordSection({ label, color, keywords, onAdd, onRemove, placeh
   const [input, setInput] = useState("");
 
   const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 11px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 15, outline: "none", boxSizing: "border-box" };
-  const lbl = { display: "block", fontSize: 13, color, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
+  const labelStyle = { display: "block", fontSize: 13, color, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
 
   const addAll = () => {
     if (!input.trim()) return;
@@ -53,7 +53,7 @@ export function KeywordSection({ label, color, keywords, onAdd, onRemove, placeh
 
   return (
     <div>
-      <label style={lbl}>{label}</label>
+      <label style={labelStyle}>{label}</label>
       <div style={{ display: "flex", gap: 6 }}>
         <input style={{ ...inp, flex: 1, width: "auto" }}
           placeholder={placeholder}

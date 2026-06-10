@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import { C, injectTheme } from "./lib/theme";
-import { matchesAny } from "./lib/articles";
+import { useState, useCallback, useMemo } from "react";
+import { C } from "./lib/theme";
+import { filterArticles } from "./lib/articles";
 import { useProfiles, mkProfile } from "./hooks/useProfiles";
 import { useNews } from "./hooks/useNews";
 import { usePullToRefresh } from "./hooks/usePullToRefresh";
@@ -13,8 +13,6 @@ export default function App() {
 
   const { profiles, activeId, setActiveId, initialized, saveProfile, deleteProfile, activeProfile } = useProfiles();
   const { news, loading, error, fetchedAt, fetchNews, clearNews } = useNews();
-
-  useEffect(() => { injectTheme(); }, []);
 
   const handleSaveProfile = async (profile) => {
     await saveProfile(profile);
@@ -38,13 +36,10 @@ export default function App() {
 
   const avoids = activeProfile?.avoids || [];
   const interests = activeProfile?.interests || [];
-  const displayedNews = news
-    .filter(a => !matchesAny(a, avoids))
-    .map(a => ({ ...a, _highlighted: matchesAny(a, interests) }))
-    .sort((a, b) => {
-      if (a._highlighted !== b._highlighted) return a._highlighted ? -1 : 1;
-      return new Date(b.publishedAt) - new Date(a.publishedAt);
-    });
+  const displayedNews = useMemo(
+    () => filterArticles(news, interests, avoids),
+    [news, interests, avoids]
+  );
   const filteredCount = news.length - displayedNews.length;
 
   if (!initialized) return (
@@ -172,7 +167,7 @@ export default function App() {
           {displayedNews.length > 0 && !loading && (
             <div className="gz-grid">
               {displayedNews.map((article, i) => (
-                <ArticleCard key={i} article={article} highlighted={article._highlighted} />
+                <ArticleCard key={article.url} article={article} highlighted={article._highlighted} />
               ))}
             </div>
           )}

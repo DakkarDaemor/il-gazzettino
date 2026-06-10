@@ -21,6 +21,16 @@ function titleWords(title) {
   );
 }
 
+export function filterArticles(articles, interests, avoids) {
+  return articles
+    .filter(a => !matchesAny(a, avoids))
+    .map(a => ({ ...a, _highlighted: matchesAny(a, interests) }))
+    .sort((a, b) => {
+      if (a._highlighted !== b._highlighted) return a._highlighted ? -1 : 1;
+      return new Date(b.publishedAt) - new Date(a.publishedAt);
+    });
+}
+
 export function deduplicate(articles) {
   const kept = [];
   for (const a of articles) {
