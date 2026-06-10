@@ -33,14 +33,11 @@ export function ArticleCard({ article, highlighted }) {
 
         <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 4 }}>
           <span style={{ fontSize: 12, color: C.muted }}>{domain}</span>
-          {expanded
-            ? <a href={article.url} target="_blank" rel="noopener noreferrer"
-                className="gz-card-read-link"
-                onClick={e => e.stopPropagation()}>
-                Leggi su {article.source?.name || domain} ↗
-              </a>
-            : <span style={{ fontSize: 13, color: C.green }}>↗</span>
-          }
+          <a href={article.url} target="_blank" rel="noopener noreferrer"
+            className="gz-card-read-link"
+            onClick={e => e.stopPropagation()}>
+            ↗
+          </a>
         </div>
       </div>
     </div>
