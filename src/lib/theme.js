@@ -37,8 +37,8 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 .gz-card-title{margin:0;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#ebebeb;line-height:1.3;display:block;overflow:visible}
 @media(min-width:900px){.gz-card-title{font-size:18px}}
 
-.gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:14px;color:#aaaaaa;line-height:1.6;display:none}
-@media(min-width:900px){.gz-card-desc{font-size:16px;line-height:1.5;display:block}}
+.gz-card-desc{margin:0;font-family:'Crimson Pro',serif;font-size:14px;color:#aaaaaa;line-height:1.6;max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:opacity .3s ease .12s,max-height .35s ease,transform .3s ease .12s}
+@media(min-width:900px){.gz-card-desc{font-size:16px;line-height:1.5;max-height:300px;opacity:1;transform:none;transition:none}}
 
 .gz-aside{position:fixed;inset:0;z-index:200;overflow-y:auto;background:#000;border-right:none}
 @media(min-width:640px){.gz-aside{position:sticky;inset:auto;top:0;width:310px;flex-shrink:0;max-height:100vh;z-index:10;background:#0d0d0d;border-right:1px solid #1e1e1e}}
@@ -48,7 +48,8 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 
 .gz-card--expanded .gz-card-imggrad{opacity:0}
 .gz-card--expanded .gz-card-body{margin-top:0}
-.gz-card--expanded .gz-card-desc{display:block;line-height:1.4}
+.gz-card--no-image .gz-card-body{margin-top:0}
+.gz-card--expanded .gz-card-desc{max-height:300px;opacity:1;transform:translateY(0);line-height:1.4}
 .gz-card-read-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#22c55e;text-decoration:none;font-family:'Crimson Pro',serif;font-weight:600}
 .gz-card-read-link:hover{text-decoration:underline}
 

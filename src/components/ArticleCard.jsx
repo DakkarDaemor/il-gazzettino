@@ -10,7 +10,7 @@ export function ArticleCard({ article, highlighted }) {
 
   return (
     <div
-      className={`gz-card${expanded ? " gz-card--expanded" : ""}`}
+      className={`gz-card${expanded ? " gz-card--expanded" : ""}${!hasImg ? " gz-card--no-image" : ""}`}
       style={{ border: `1px solid ${highlighted ? C.green + "88" : C.border}`, cursor: "pointer" }}
       onClick={() => setExpanded(e => !e)}>
 
