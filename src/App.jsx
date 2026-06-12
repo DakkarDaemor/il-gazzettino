@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { C } from "./lib/theme";
 import { filterArticles } from "./lib/articles";
 import { useProfiles, mkProfile } from "./hooks/useProfiles";
@@ -10,6 +10,14 @@ import { Sidebar } from "./components/Sidebar";
 export default function App() {
   const [panel, setPanel] = useState(null);
   const [editingProfile, setEditingProfile] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+    else setSearchQuery("");
+  }, [searchOpen]);
 
   const { profiles, activeId, setActiveId, initialized, saveProfile, deleteProfile, activeProfile } = useProfiles();
   const { news, loading, error, fetchedAt, fetchNews, clearNews } = useNews();
@@ -42,6 +50,16 @@ export default function App() {
   );
   const filteredCount = news.length - displayedNews.length;
 
+  const visibleNews = useMemo(() => {
+    if (!searchQuery.trim()) return displayedNews;
+    const q = searchQuery.trim().toLowerCase();
+    return displayedNews.filter(a =>
+      a.title?.toLowerCase().includes(q) ||
+      a.description?.toLowerCase().includes(q) ||
+      a.source?.name?.toLowerCase().includes(q)
+    );
+  }, [displayedNews, searchQuery]);
+
   if (!initialized) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: C.bg, color: C.green, fontSize: 30 }}>·</div>
   );
@@ -60,6 +78,10 @@ export default function App() {
             </span>
           </div>
           <div style={{ display: "flex", gap: 4 }}>
+            {displayedNews.length > 0 && (
+              <button onClick={() => setSearchOpen(o => !o)} title="Cerca"
+                style={{ background: searchOpen ? C.greenDim : "none", border: `1px solid ${searchOpen ? C.green + "44" : "transparent"}`, borderRadius: 6, color: searchOpen ? C.green : C.muted, cursor: "pointer", fontSize: 17, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>⌕</button>
+            )}
             {activeProfile?.feeds?.length > 0 && (
               <button onClick={doRefresh} disabled={loading} title="Aggiorna"
                 style={{ background: "none", border: "1px solid transparent", borderRadius: 6, color: loading ? C.border : C.muted, cursor: loading ? "not-allowed" : "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>↻</button>
@@ -68,6 +90,26 @@ export default function App() {
               style={{ background: panel === "profiles" ? C.greenDim : "none", border: `1px solid ${panel === "profiles" ? C.green + "44" : "transparent"}`, borderRadius: 6, color: panel === "profiles" ? C.green : C.muted, cursor: "pointer", fontSize: 18, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>☰</button>
           </div>
         </div>
+        {searchOpen && (
+          <div style={{ padding: "0 16px 10px", display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => e.key === "Escape" && setSearchOpen(false)}
+              placeholder="Filtra articoli…"
+              style={{ flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRadius: 6, padding: "8px 12px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 16, outline: "none" }}
+            />
+            {searchQuery && (
+              <span style={{ fontSize: 13, color: C.muted, flexShrink: 0, whiteSpace: "nowrap" }}>
+                {visibleNews.length} risultati
+              </span>
+            )}
+            <button onClick={() => setSearchOpen(false)} title="Chiudi"
+              style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 18, padding: "4px 8px", lineHeight: 1 }}>✕</button>
+          </div>
+        )}
       </header>
 
       {dist > 0 && (
@@ -133,9 +175,10 @@ export default function App() {
               <span style={{ color: C.green, fontSize: 9 }}>●</span>
               <span>{fetchedAt}</span>
               <span>·</span>
-              <span>{displayedNews.length} articoli</span>
+              <span>{visibleNews.length} articoli</span>
               {filteredCount > 0 && <span style={{ color: C.danger }}>· {filteredCount} filtrati</span>}
-              {interests.length > 0 && <span style={{ color: C.green }}>· ★ {displayedNews.filter(a => a._highlighted).length} in evidenza</span>}
+              {searchQuery.trim() && visibleNews.length < displayedNews.length && <span style={{ color: C.orange }}>· ricerca attiva</span>}
+              {interests.length > 0 && !searchQuery.trim() && <span style={{ color: C.green }}>· ★ {displayedNews.filter(a => a._highlighted).length} in evidenza</span>}
             </div>
           )}
 
@@ -164,11 +207,17 @@ export default function App() {
             </div>
           )}
 
-          {displayedNews.length > 0 && !loading && (
+          {visibleNews.length > 0 && !loading && (
             <div className="gz-grid">
-              {displayedNews.map((article, i) => (
+              {visibleNews.map((article) => (
                 <ArticleCard key={article.url} article={article} highlighted={article._highlighted} />
               ))}
+            </div>
+          )}
+
+          {searchQuery.trim() && visibleNews.length === 0 && !loading && (
+            <div style={{ textAlign: "center", padding: "60px 20px", color: C.muted, fontFamily: "Playfair Display, serif", fontSize: 18 }}>
+              Nessun articolo trovato per "<span style={{ color: C.text }}>{searchQuery}</span>"
             </div>
           )}
         </main>
