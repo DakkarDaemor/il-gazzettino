@@ -3,129 +3,88 @@ import { C } from "../lib/theme";
 import { KeywordSection } from "./KeywordSection";
 import { FeedSearchPanel } from "./FeedSearchPanel";
 
-export function ProfileEditor({ profile, onSave, onDelete, onCancel }) {
-  const [form, setForm] = useState({
-    ...profile,
-    feeds: [...(profile.feeds || [])],
-    interests: [...(profile.interests || [])],
-    avoids: [...(profile.avoids || [])],
-  });
+export function ProfileEditor({ form, onChange }) {
   const [newFeedUrl, setNewFeedUrl] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const isNew = !!profile._isNew;
 
   const inp = { width: "100%", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 13px", color: C.text, fontFamily: "Crimson Pro, serif", fontSize: 16, outline: "none", boxSizing: "border-box" };
-  const labelStyle = { display: "block", fontSize: 13, color: C.muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
-  const divider = <div style={{ height: 1, background: C.border }} />;
+  const labelStyle = { display: "block", fontSize: 13, color: C.label, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6, fontFamily: "Crimson Pro, serif" };
+  const divider = <div style={{ height: 1, background: C.border, margin: "4px 0" }} />;
 
   const addFeed = (url, label) => {
     const u = (url ?? newFeedUrl).trim();
     if (!u || form.feeds.some(f => f.url === u)) return;
     let lbl = label?.trim() || "";
     if (!lbl) { try { lbl = new URL(u).hostname.replace("www.", ""); } catch { lbl = u; } }
-    setForm(f => ({ ...f, feeds: [...f.feeds, { url: u, label: lbl }] }));
+    onChange({ ...form, feeds: [...form.feeds, { url: u, label: lbl }] });
     if (!url) setNewFeedUrl("");
   };
 
-  const removeFeed = (url) => setForm(f => ({ ...f, feeds: f.feeds.filter(fd => fd.url !== url) }));
-  const addKw = (list, kw) => { if (kw && !form[list].includes(kw)) setForm(f => ({ ...f, [list]: [...f[list], kw] })); };
-  const removeKw = (list, kw) => setForm(f => ({ ...f, [list]: f[list].filter(k => k !== kw) }));
-
-  const btn = (style) => ({
-    border: "none", borderRadius: 6, padding: "12px 15px", fontFamily: "Playfair Display, serif",
-    fontSize: 15, fontWeight: 700, cursor: "pointer", minHeight: 46, ...style,
-  });
+  const removeFeed = (url) => onChange({ ...form, feeds: form.feeds.filter(f => f.url !== url) });
+  const addKw = (list, kw) => { if (kw && !form[list].includes(kw)) onChange({ ...form, [list]: [...form[list], kw] }); };
+  const removeKw = (list, kw) => onChange({ ...form, [list]: form[list].filter(k => k !== kw) });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "0 10px" }}>
-        <div>
-          <label style={labelStyle}>Nome NotiziAI</label>
-          <input style={inp} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+      <div>
+        <label style={labelStyle}>Nome profilo</label>
+        <input style={inp} value={form.name} onChange={e => onChange({ ...form, name: e.target.value })} />
+      </div>
+
+      {divider}
+
+      <div>
+        <label style={labelStyle}>Feed RSS</label>
+        <div style={{ display: "flex", gap: 6, marginBottom: 9 }}>
+          <input style={{ ...inp, flex: 1, width: "auto" }}
+            placeholder="https://esempio.it/rss.xml"
+            value={newFeedUrl}
+            onChange={e => setNewFeedUrl(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && addFeed()}
+          />
+          <button onClick={() => addFeed(undefined)}
+            style={{ border: "none", borderRadius: 6, padding: "12px 15px", fontFamily: "Playfair Display, serif", fontSize: 15, fontWeight: 700, cursor: "pointer", minHeight: 46, background: C.green, color: "#000", minWidth: 46 }}>+</button>
         </div>
 
-        {divider}
-
-        <div>
-          <label style={labelStyle}>Feed RSS</label>
-          <div style={{ display: "flex", gap: 6, marginBottom: 9 }}>
-            <input style={{ ...inp, flex: 1, width: "auto" }}
-              placeholder="https://esempio.it/rss.xml"
-              value={newFeedUrl}
-              onChange={e => setNewFeedUrl(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addFeed()}
-            />
-            <button onClick={() => addFeed(undefined)}
-              style={btn({ background: C.green, color: "#000", minWidth: 46 })}>+</button>
-          </div>
-
-          {form.feeds.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 11 }}>
-              {form.feeds.map(feed => (
-                <div key={feed.url} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 13px" }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{feed.label}</div>
-                    <div style={{ fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1 }}>{feed.url}</div>
-                  </div>
-                  <button onClick={() => removeFeed(feed.url)}
-                    style={{ background: "transparent", border: `1px solid ${C.danger}55`, borderRadius: 4, color: C.danger, cursor: "pointer", fontSize: 13, padding: "4px 9px", flexShrink: 0, minHeight: 30 }}>Rimuovi</button>
+        {form.feeds.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 11 }}>
+            {form.feeds.map(feed => (
+              <div key={feed.url} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 6, padding: "9px 13px" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{feed.label}</div>
+                  <div style={{ fontSize: 11, color: C.muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1 }}>{feed.url}</div>
                 </div>
-              ))}
-            </div>
-          )}
-
-          <div>
-            <span style={{ ...labelStyle, marginBottom: 6 }}>Cerca feed per argomento</span>
-            <FeedSearchPanel existingFeeds={form.feeds} onAdd={addFeed} />
+                <button onClick={() => removeFeed(feed.url)}
+                  style={{ background: "transparent", border: `1px solid ${C.danger}55`, borderRadius: 4, color: C.danger, cursor: "pointer", fontSize: 13, padding: "4px 9px", flexShrink: 0, minHeight: 30 }}>Rimuovi</button>
+              </div>
+            ))}
           </div>
-
-        </div>
-
-        {divider}
-
-        <KeywordSection
-          label="★ Argomenti di interesse"
-          color={C.green}
-          keywords={form.interests}
-          onAdd={kw => addKw("interests", kw)}
-          onRemove={kw => removeKw("interests", kw)}
-          placeholder='es. tecnologia, "serie A"…'
-        />
-
-        <KeywordSection
-          label="✕ Argomenti da evitare"
-          color={C.danger}
-          keywords={form.avoids}
-          onAdd={kw => addKw("avoids", kw)}
-          onRemove={kw => removeKw("avoids", kw)}
-          placeholder="es. gossip, sport…"
-        />
-      </div>
-
-      <div style={{ position: "sticky", bottom: 0, background: "#333", borderTop: `1px solid ${C.border}`, padding: "10px", marginTop: 8, width: "100%" }}>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => onSave(form)} disabled={!form.name.trim()}
-            style={btn({ flex: 1, background: form.name.trim() ? C.green : "#222", color: form.name.trim() ? "#000" : C.muted, cursor: form.name.trim() ? "pointer" : "not-allowed" })}>
-            Salva
-          </button>
-          <button onClick={onCancel}
-            style={btn({ flex: 1, background: "transparent", border: `1px solid ${C.border}`, color: C.muted, cursor: "pointer", fontWeight: 400, fontFamily: "Crimson Pro, serif" })}>
-            Annulla
-          </button>
-          {!isNew && !confirmDelete && (
-            <button onClick={() => setConfirmDelete(true)}
-              style={btn({ background: "transparent", border: `1px solid ${C.danger}55`, color: C.danger, cursor: "pointer", minWidth: 46 })}>✕</button>
-          )}
-          {!isNew && confirmDelete && (
-            <button onClick={() => onDelete(profile.id)}
-              style={btn({ background: "#1a0606", border: `1px solid ${C.danger}`, color: C.danger, cursor: "pointer" })}>Sicuro?</button>
-          )}
-        </div>
-        {confirmDelete && (
-          <button onClick={() => setConfirmDelete(false)}
-            style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 14, fontFamily: "Crimson Pro, serif", textAlign: "left", padding: "6px 0 0" }}>← annulla eliminazione</button>
         )}
+
+        <div>
+          <span style={{ ...labelStyle, marginBottom: 6 }}>Cerca feed per argomento</span>
+          <FeedSearchPanel existingFeeds={form.feeds} onAdd={addFeed} />
+        </div>
       </div>
+
+      {divider}
+
+      <KeywordSection
+        label="★ Argomenti di interesse"
+        color={C.green}
+        keywords={form.interests}
+        onAdd={kw => addKw("interests", kw)}
+        onRemove={kw => removeKw("interests", kw)}
+        placeholder='es. tecnologia, "serie A"…'
+      />
+
+      <KeywordSection
+        label="✕ Argomenti da evitare"
+        color={C.danger}
+        keywords={form.avoids}
+        onAdd={kw => addKw("avoids", kw)}
+        onRemove={kw => removeKw("avoids", kw)}
+        placeholder="es. gossip, sport…"
+      />
     </div>
   );
 }

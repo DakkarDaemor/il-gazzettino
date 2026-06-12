@@ -6,6 +6,7 @@ export const C = {
   hover:    "#161616",
   green:    "#22c55e",
   greenDim: "#071a0e",
+  label:    "#A0A0A0",
   text:     "#ebebeb",
   muted:    "#888888",
   border:   "#666666",
