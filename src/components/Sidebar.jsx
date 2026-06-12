@@ -4,7 +4,7 @@ import { ProfileEditor } from "./ProfileEditor";
 export function Sidebar({ profiles, activeId, activeProfile, editingProfile, setEditingProfile, onClose, onSaveProfile, onDeleteProfile, onCreateNew, onSetActive }) {
   return (
     <aside className="gz-aside">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 18px 14px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "inherit", zIndex: 1 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 18px 10px", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, background: "inherit", zIndex: 1 }}>
         <h2 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 15, color: C.green, textTransform: "uppercase", letterSpacing: 1.2 }}>
           {editingProfile ? (editingProfile._isNew ? "Nuovo profilo" : "Modifica") : "Profili"}
         </h2>
@@ -12,7 +12,7 @@ export function Sidebar({ profiles, activeId, activeProfile, editingProfile, set
           style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, color: C.muted, cursor: "pointer", fontSize: 17, padding: "4px 11px", minWidth: 38, minHeight: 38 }}>✕</button>
       </div>
 
-      <div style={{ padding: "0 18px 24px" }}>
+      <div style={{ padding: 0 }}>
         {editingProfile ? (
           <div style={{ paddingTop: 16 }}>
             <ProfileEditor

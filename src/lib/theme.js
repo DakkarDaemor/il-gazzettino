@@ -2,13 +2,13 @@
    Contrasti su #000:  text 15.4:1 · muted 5.9:1 · green 9.2:1 · danger 5.6:1 */
 export const C = {
   bg:       "#000000",
-  card:     "#0d0d0d",
+  card:     "#333333",
   hover:    "#161616",
   green:    "#22c55e",
   greenDim: "#071a0e",
   text:     "#ebebeb",
   muted:    "#888888",
-  border:   "#1e1e1e",
+  border:   "#666666",
   danger:   "#ef4444",
   orange:   "#f97316",
 };

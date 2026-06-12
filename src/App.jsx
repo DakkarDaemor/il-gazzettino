@@ -80,7 +80,7 @@ export default function App() {
           <div style={{ display: "flex", gap: 4 }}>
             {displayedNews.length > 0 && (
               <button onClick={() => setSearchOpen(o => !o)} title="Cerca"
-                style={{ background: searchOpen ? C.greenDim : "none", border: `1px solid ${searchOpen ? C.green + "44" : "transparent"}`, borderRadius: 6, color: searchOpen ? C.green : C.muted, cursor: "pointer", fontSize: 17, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>⌕</button>
+                style={{ background: searchOpen ? C.greenDim : "none", border: `1px solid ${searchOpen ? C.green + "44" : "transparent"}`, borderRadius: 6, color: searchOpen ? C.green : C.muted, cursor: "pointer", fontSize: 24, padding: "6px 10px", minWidth: 46, minHeight: 46, display: "flex", alignItems: "center", justifyContent: "center" }}>⌕</button>
             )}
             {activeProfile?.feeds?.length > 0 && (
               <button onClick={doRefresh} disabled={loading} title="Aggiorna"

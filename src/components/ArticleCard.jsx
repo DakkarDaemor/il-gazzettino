@@ -11,16 +11,15 @@ export function ArticleCard({ article, highlighted }) {
   return (
     <div
       className={`gz-card${expanded ? " gz-card--expanded" : ""}${!hasImg ? " gz-card--no-image" : ""}`}
-      style={{ border: `1px solid ${highlighted ? C.green + "88" : C.border}`, cursor: "pointer" }}
+      style={{ border: `2px solid ${highlighted ? C.green + "88" : C.border}`, cursor: "pointer" }}
       onClick={() => setExpanded(e => !e)}>
 
-      {hasImg
-        ? <div className="gz-card-imgwrap">
-            <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
-            <div className="gz-card-imggrad" />
-          </div>
-        : <div className="gz-card-stripe" style={{ background: highlighted ? C.green : "#2a2a2a" }} />
-      }
+      {hasImg && (
+        <div className="gz-card-imgwrap">
+          <img src={article.image} alt="" className="gz-card-img" onError={() => setImgFailed(true)} />
+          <div className="gz-card-imggrad" />
+        </div>
+      )}
 
       <div className="gz-card-body">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6 }}>
