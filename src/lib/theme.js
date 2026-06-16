@@ -49,6 +49,7 @@ body{margin:0;background:#000;overflow-x:hidden;overscroll-behavior-y:none}
 
 .gz-card--expanded .gz-card-imggrad{opacity:0}
 .gz-card--expanded .gz-card-body{margin-top:0}
+.gz-card--expanded .gz-card-img{aspect-ratio:auto}
 .gz-card--no-image .gz-card-body{margin-top:0}
 .gz-card--expanded .gz-card-desc{max-height:300px;opacity:1;transform:translateY(0);line-height:1.4}
 .gz-card-read-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#22c55e;text-decoration:none;font-family:'Crimson Pro',serif;font-weight:600}
